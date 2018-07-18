@@ -55,7 +55,7 @@ TEST_CASE("Matrix") {
         REQUIRE(std::equal(actual.begin(), actual.end(), expected.begin(), expected.end()));
     }
 
-    SECTION("implace multiplication") {
+    SECTION("inplace multiplication") {
         Matrix<int> expected{{82, 88}, {199, 214}};
         Matrix<int> actual = {{1, 2, 3}, {4, 5, 6}};
         actual *= Matrix<int>{{11, 12}, {13, 14}, {15, 16}};
