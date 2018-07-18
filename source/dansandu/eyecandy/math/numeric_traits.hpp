@@ -10,6 +10,14 @@ template<typename T>
 struct numeric_traits {};
 
 template<>
+struct numeric_traits<int> {
+    static constexpr int addition_identity = 0;
+    static constexpr int multiplicative_identity = 1;
+
+    static constexpr bool equal(int lhs, int rhs, int epsilon) { return lhs == rhs; }
+};
+
+template<>
 struct numeric_traits<float> {
     static constexpr float addition_identity = 0.0F;
     static constexpr float multiplicative_identity = 1.0F;

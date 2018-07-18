@@ -49,13 +49,17 @@ public:
 
     size_type columns() const noexcept { return columns_; }
 
-    value_type& operator()(size_type row, size_type column) { return data_[columns_ * row + column]; }
+    value_type& operator()(size_type row, size_type column) noexcept { return data_[columns_ * row + column]; }
 
-    value_type operator()(const size_type row, const size_type column) const { return data_[columns_ * row + column]; }
+    value_type operator()(const size_type row, const size_type column) const noexcept {
+        return data_[columns_ * row + column];
+    }
 
-    Matrix<value_type>& operator=(const Matrix<value_type>& rhs) = default;
+    Matrix& operator=(const Matrix& rhs) = default;
 
-    Matrix<value_type>& operator=(Matrix<value_type>&& rhs) noexcept = default;
+    Matrix& operator=(Matrix&& rhs) noexcept = default;
+
+    Matrix& operator*=(const Matrix& rhs);
 
     iterator begin() { return data_.begin(); }
 
@@ -70,6 +74,24 @@ private:
     size_type columns_;
     std::vector<value_type> data_;
 };
+
+template<typename T>
+Matrix<T> operator*(const Matrix<T>& lhs, const Matrix<T>& rhs) {
+    if (lhs.columns() != rhs.rows())
+        throw std::runtime_error("left hand side matrix columns do not match right hand side matrix rows");
+
+    Matrix<T> result(lhs.rows(), rhs.columns());
+    for (auto i = 0; i < lhs.rows(); ++i)
+        for (auto k = 0; k < rhs.columns(); ++k)
+            for (auto j = 0; j < lhs.columns(); ++j)
+                result(i, k) += lhs(i, j) * rhs(j, k);
+    return result;
+}
+
+template<typename T>
+Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs) {
+    return *this = *this * rhs;
+}
 }
 }
 }
