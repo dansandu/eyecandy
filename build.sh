@@ -1,2 +1,0 @@
-g++ source/dansandu/eyecandy/math/matrix.t.cpp source/dansandu/eyecandy/test.cpp -I/home/udantu/workspace/eyecandy/thirdparties -I/home/udantu/workspace/eyecandy/source -o target/eyecandy-test.exe
-g++ source/dansandu/eyecandy/main.cpp -I/home/udantu/workspace/eyecandy/thirdparties -I/home/udantu/workspace/eyecandy/source -o target/eyecandy-main.exe
