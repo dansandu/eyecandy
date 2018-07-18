@@ -32,27 +32,26 @@ TEST_CASE("Matrix") {
 
     SECTION("construction with initializer list") {
         Matrix<double> nullMatrix{{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+        Matrix<double> expected(2, 3);
 
-        REQUIRE(nullMatrix.rows() == 2);
-        REQUIRE(nullMatrix.columns() == 3);
+        REQUIRE(nullMatrix.closeTo(expected, 0.0));
     }
 
-    SECTION("assignment") {
-        Matrix<double> original{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
-        Matrix<double> copy = original;
+    SECTION("assignment and equality") {
+        Matrix<int> original{{1, 2, 3}, {4, 5, 6}};
+        auto copy = original;
 
         REQUIRE(original.rows() == copy.rows());
         REQUIRE(original.columns() == copy.columns());
         REQUIRE(std::equal(original.begin(), original.end(), copy.begin(), copy.end()));
+        REQUIRE(copy.closeTo(original, 0));
     }
 
     SECTION("multiplication") {
         Matrix<int> expected{{82, 88}, {199, 214}};
         auto actual = Matrix<int>{{1, 2, 3}, {4, 5, 6}} * Matrix<int>{{11, 12}, {13, 14}, {15, 16}};
 
-        REQUIRE(actual.rows() == expected.rows());
-        REQUIRE(actual.columns() == expected.columns());
-        REQUIRE(std::equal(actual.begin(), actual.end(), expected.begin(), expected.end()));
+        REQUIRE(expected.closeTo(actual, 0));
     }
 
     SECTION("inplace multiplication") {
@@ -60,8 +59,6 @@ TEST_CASE("Matrix") {
         Matrix<int> actual = {{1, 2, 3}, {4, 5, 6}};
         actual *= Matrix<int>{{11, 12}, {13, 14}, {15, 16}};
 
-        REQUIRE(actual.rows() == expected.rows());
-        REQUIRE(actual.columns() == expected.columns());
-        REQUIRE(std::equal(actual.begin(), actual.end(), expected.begin(), expected.end()));
+        REQUIRE(expected.closeTo(actual, 0));
     }
 }

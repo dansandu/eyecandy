@@ -3,6 +3,7 @@
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 #include <vector>
 
@@ -61,9 +62,19 @@ public:
 
     Matrix& operator*=(const Matrix& rhs);
 
+    bool closeTo(const Matrix& rhs, value_type epsilon) {
+        return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
+               std::equal(begin(), end(), rhs.begin(), rhs.end(),
+                          [epsilon](auto a, auto b) { return dansandu::eyecandy::math::closeTo(a, b, epsilon); });
+    }
+
     iterator begin() { return data_.begin(); }
 
     iterator end() { return data_.end(); }
+
+    const_iterator begin() const { return data_.begin(); }
+
+    const_iterator end() const { return data_.end(); }
 
     const_iterator cbegin() const { return data_.cbegin(); }
 
