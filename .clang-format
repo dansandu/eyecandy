@@ -1,0 +1,12 @@
+Language: Cpp
+AccessModifierOffset: -4
+AlwaysBreakTemplateDeclarations: true
+ColumnLimit: 120
+FixNamespaceComments: false
+IndentWidth: 4
+PointerAlignment: Left
+SortIncludes: true
+SortUsingDeclarations: true
+SpaceAfterTemplateKeyword: false
+SpacesInAngles: false
+UseTab: Never
