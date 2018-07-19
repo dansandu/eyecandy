@@ -4,7 +4,9 @@ import subprocess
 
 def execute(command):
     print(' '.join(command))
-    subprocess.run(command)
+    process = subprocess.run(command)
+    if process.returncode is not 0:
+        raise RuntimeError(f'exited with status code {process.returncode}')
 
 if __name__ == '__main__':
     files_to_format = []
@@ -19,8 +21,8 @@ if __name__ == '__main__':
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
              '-o', 'target/eyecandy-test.exe'])
 
+    execute(['./target/eyecandy-test.exe'])
+
     execute(['g++', 'source/dansandu/eyecandy/main.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
              '-o', 'target/eyecandy-main.exe'])
-
-    execute(['./target/eyecandy-test.exe'])
