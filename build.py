@@ -19,10 +19,12 @@ if __name__ == '__main__':
     execute(['g++', 'source/dansandu/eyecandy/math/matrix.t.cpp', 'source/dansandu/eyecandy/math/transformation.t.cpp',
              'source/dansandu/eyecandy/test.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
+             '-Werror', '-Wall', '-Wextra',
              '-o', 'target/eyecandy-test.exe'])
 
     execute(['./target/eyecandy-test.exe'])
 
     execute(['g++', 'source/dansandu/eyecandy/main.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
+             '-Werror', '-Wall', '-Wextra',
              '-o', 'target/eyecandy-main.exe'])

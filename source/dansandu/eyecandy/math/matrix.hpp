@@ -4,6 +4,7 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
 #include <algorithm>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -61,6 +62,7 @@ public:
             data_ = std::move(rhs.data_);
             rhs.rows_ = rhs.columns_ = 0;
         }
+        return *this;
     }
 
     Matrix& operator*=(const Matrix& rhs);
