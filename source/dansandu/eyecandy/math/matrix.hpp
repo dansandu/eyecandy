@@ -4,7 +4,6 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
 #include <algorithm>
-#include <sstream>
 #include <stdexcept>
 #include <vector>
 

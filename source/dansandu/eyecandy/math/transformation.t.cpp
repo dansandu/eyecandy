@@ -2,12 +2,11 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"
 
-#include <iostream>
-
 using dansandu::eyecandy::math::identity;
 using dansandu::eyecandy::math::Matrix;
 using dansandu::eyecandy::math::pi;
 using dansandu::eyecandy::math::rotationByX;
+using dansandu::eyecandy::math::rotationByY;
 using dansandu::eyecandy::math::scaling;
 using dansandu::eyecandy::math::translation;
 
@@ -38,6 +37,14 @@ TEST_CASE() {
         auto actual = rotationByX<double>(pi<double> / 2);
         auto expected =
             Matrix<double>{{1.0, 0.0, 0.0, 0.0}, {0.0, 0.0, -1.0, 0.0}, {0.0, 1.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 1.0}};
+
+        REQUIRE(actual.closeTo(expected, 10e-15));
+    }
+
+    SECTION("rotation by Y axis") {
+        auto actual = rotationByY<double>(pi<double> / 2);
+        auto expected =
+            Matrix<double>{{0.0, 0.0, 1.0, 0.0}, {0.0, 1.0, 0.0, 0.0}, {-1.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 1.0}};
 
         REQUIRE(actual.closeTo(expected, 10e-15));
     }

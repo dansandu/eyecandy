@@ -64,6 +64,19 @@ Matrix<T> rotationByX(T radians) {
     result(2, 2) = cos;
     return result;
 }
+
+template<typename T>
+Matrix<T> rotationByY(T radians) {
+    auto result = Matrix<T>(4, 4);
+    result(1, 1) = result(3, 3) = multiplicative_identity<T>;
+    auto cos = std::cos(radians);
+    auto sin = std::sin(radians);
+    result(0, 0) = cos;
+    result(0, 2) = sin;
+    result(2, 0) = -sin;
+    result(2, 2) = cos;
+    return result;
+}
 }
 }
 }
