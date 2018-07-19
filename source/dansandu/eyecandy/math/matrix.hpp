@@ -3,6 +3,7 @@
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 #include <vector>
 
@@ -15,14 +16,14 @@ class Matrix {
 public:
     using size_type = int;
     using value_type = T;
-    using iterator = typename std::vector<value_type>::iterator;
-    using const_iterator = typename std::vector<value_type>::const_iterator;
 
     Matrix() : rows_{0}, columns_{0} {}
 
-    Matrix(const Matrix& input) = default;
+    Matrix(const Matrix& rhs) = default;
 
-    Matrix(Matrix&& input) noexcept = default;
+    Matrix(Matrix&& rhs) noexcept : rows_{rhs.rows_}, columns_{rhs.columns_}, data_{std::move(rhs.data_)} {
+        rhs.rows_ = rhs.columns_ = 0;
+    }
 
     Matrix(size_type rows, size_type columns, value_type fillValue = addition_identity<value_type>)
         : rows_{rows}, columns_{columns} {
@@ -32,22 +33,18 @@ public:
         data_ = std::vector<value_type>(rows_ * columns_, fillValue);
     }
 
-    Matrix(std::initializer_list<std::initializer_list<value_type>> input) {
-        if ((rows_ = input.size()) != 0)
-            columns_ = input.begin()->size();
+    Matrix(std::initializer_list<std::initializer_list<value_type>> list) {
+        if ((rows_ = list.size()) != 0)
+            columns_ = list.begin()->size();
         else
             columns_ = 0;
 
-        for (auto row : input) {
+        for (auto row : list) {
             data_.insert(data_.end(), row.begin(), row.end());
             if (columns_ != static_cast<size_type>(row.size()))
                 throw std::runtime_error("columns must be the same size");
         }
     }
-
-    size_type rows() const noexcept { return rows_; }
-
-    size_type columns() const noexcept { return columns_; }
 
     value_type& operator()(size_type row, size_type column) noexcept { return data_[columns_ * row + column]; }
 
@@ -57,17 +54,26 @@ public:
 
     Matrix& operator=(const Matrix& rhs) = default;
 
-    Matrix& operator=(Matrix&& rhs) noexcept = default;
+    Matrix& operator=(Matrix&& rhs) noexcept {
+        if (this != &rhs) {
+            rows_ = rhs.rows_;
+            columns_ = rhs.columns_;
+            data_ = std::move(rhs.data_);
+            rhs.rows_ = rhs.columns_ = 0;
+        }
+    }
 
     Matrix& operator*=(const Matrix& rhs);
 
-    iterator begin() { return data_.begin(); }
+    size_type rows() const noexcept { return rows_; }
 
-    iterator end() { return data_.end(); }
+    size_type columns() const noexcept { return columns_; }
 
-    const_iterator cbegin() const { return data_.cbegin(); }
-
-    const_iterator cend() const { return data_.cend(); }
+    bool closeTo(const Matrix& rhs, value_type epsilon) const {
+        return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
+               std::equal(data_.begin(), data_.end(), rhs.data_.begin(), rhs.data_.end(),
+                          [epsilon](auto a, auto b) { return dansandu::eyecandy::math::closeTo(a, b, epsilon); });
+    }
 
 private:
     size_type rows_;
