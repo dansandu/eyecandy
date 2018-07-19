@@ -33,6 +33,22 @@ Matrix<T> scaling(AA... args) {
     scalingWork<0, T>(result, std::forward<AA>(args)...);
     return result;
 }
+
+template<int index, typename T>
+void translationWork(Matrix<T>& matrix) {}
+
+template<int index, typename T, typename A, typename... AA>
+void translationWork(Matrix<T>& matrix, A arg, AA... args) {
+    matrix(index, matrix.columns() - 1) = arg;
+    translationWork<index + 1, T>(matrix, std::forward<AA>(args)...);
+}
+
+template<typename T, typename... AA>
+Matrix<T> translation(AA... args) {
+    auto result = identity<T>(sizeof...(AA) + 1);
+    translationWork<0, T>(result, std::forward<AA>(args)...);
+    return result;
+}
 }
 }
 }
