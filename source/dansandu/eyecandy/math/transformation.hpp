@@ -3,6 +3,8 @@
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
+#include <cmath>
+
 namespace dansandu {
 namespace eyecandy {
 namespace math {
@@ -35,7 +37,7 @@ Matrix<T> scaling(AA... args) {
 }
 
 template<int index, typename T>
-void translationWork(Matrix<T>& matrix) {}
+void translationWork(Matrix<T>&) {}
 
 template<int index, typename T, typename A, typename... AA>
 void translationWork(Matrix<T>& matrix, A arg, AA... args) {
@@ -47,6 +49,19 @@ template<typename T, typename... AA>
 Matrix<T> translation(AA... args) {
     auto result = identity<T>(sizeof...(AA) + 1);
     translationWork<0, T>(result, std::forward<AA>(args)...);
+    return result;
+}
+
+template<typename T>
+Matrix<T> rotationByX(T radians) {
+    auto result = Matrix<T>(4, 4);
+    result(0, 0) = result(3, 3) = multiplicative_identity<T>;
+    auto cos = std::cos(radians);
+    auto sin = std::sin(radians);
+    result(1, 1) = cos;
+    result(1, 2) = -sin;
+    result(2, 1) = sin;
+    result(2, 2) = cos;
     return result;
 }
 }
