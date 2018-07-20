@@ -12,8 +12,13 @@ class Color {
 public:
     friend constexpr bool operator==(Color lhs, Color rhs) { return lhs.rgba_ == rhs.rgba_; }
 
-    constexpr Color() : rgba_{0U} {}
+    constexpr Color() noexcept : rgba_{0U} {}
+
+    constexpr Color(uint32_t rgba) noexcept : rgba_{rgba} {}
+
     constexpr Color(Colors color) noexcept : rgba_{static_cast<uint32_t>(color)} {}
+
+    constexpr uint32_t code() const noexcept { return rgba_; }
 
 private:
     uint32_t rgba_;
