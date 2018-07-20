@@ -54,39 +54,43 @@ Matrix<T> translation(AA... args) {
 
 template<typename T>
 Matrix<T> rotationByX(T radians) {
-    auto result = Matrix<T>(4, 4);
-    result(0, 0) = result(3, 3) = multiplicative_identity<T>;
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = addition_identity<T>;
     auto cos = std::cos(radians);
     auto sin = std::sin(radians);
-    result(1, 1) = cos;
-    result(1, 2) = -sin;
-    result(2, 1) = sin;
-    result(2, 2) = cos;
-    return result;
+    // clang-format off
+    return {{_1,  _0,   _0, _0},
+            {_0, cos, -sin, _0},
+            {_0, sin,  cos, _0},
+            {_0,  _0,   _0, _1}};
+    // clang-format on
 }
 
 template<typename T>
 Matrix<T> rotationByY(T radians) {
-    auto result = Matrix<T>(4, 4);
-    result(1, 1) = result(3, 3) = multiplicative_identity<T>;
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = addition_identity<T>;
     auto cos = std::cos(radians);
     auto sin = std::sin(radians);
-    result(0, 0) = cos;
-    result(0, 2) = sin;
-    result(2, 0) = -sin;
-    result(2, 2) = cos;
-    return result;
+    // clang-format off
+    return {{ cos, _0, sin, _0},
+            {  _0, _1,  _0, _0},
+            {-sin, _0, cos, _0},
+            {  _0, _0,  _0, _1}};
+    // clang-format on
 }
 
 template<typename T>
 Matrix<T> rotationByZ(T radians) {
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = addition_identity<T>;
     auto cos = std::cos(radians);
     auto sin = std::sin(radians);
     // clang-format off
-    return {{cos, -sin, 0.0, 0.0},
-            {sin,  cos, 0.0, 0.0},
-            {0.0,  0.0, 1.0, 0.0},
-            {0.0,  0.0, 0.0, 1.0}};
+    return {{cos, -sin, _0, _0},
+            {sin,  cos, _0, _0},
+            { _0,   _0, _1, _0},
+            { _0,   _0, _0, _1}};
     // clang-format on
 }
 }
