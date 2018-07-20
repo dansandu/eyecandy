@@ -77,6 +77,18 @@ Matrix<T> rotationByY(T radians) {
     result(2, 2) = cos;
     return result;
 }
+
+template<typename T>
+Matrix<T> rotationByZ(T radians) {
+    auto cos = std::cos(radians);
+    auto sin = std::sin(radians);
+    // clang-format off
+    return {{cos, -sin, 0.0, 0.0},
+            {sin,  cos, 0.0, 0.0},
+            {0.0,  0.0, 1.0, 0.0},
+            {0.0,  0.0, 0.0, 1.0}};
+    // clang-format on
+}
 }
 }
 }
