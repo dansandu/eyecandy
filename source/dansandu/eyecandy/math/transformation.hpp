@@ -55,7 +55,7 @@ Matrix<T> translation(AA... args) {
 template<typename T>
 Matrix<T> rotationByX(T radians) {
     constexpr auto _1 = multiplicative_identity<T>;
-    constexpr auto _0 = addition_identity<T>;
+    constexpr auto _0 = additive_identity<T>;
     auto cos = std::cos(radians);
     auto sin = std::sin(radians);
     // clang-format off
@@ -69,7 +69,7 @@ Matrix<T> rotationByX(T radians) {
 template<typename T>
 Matrix<T> rotationByY(T radians) {
     constexpr auto _1 = multiplicative_identity<T>;
-    constexpr auto _0 = addition_identity<T>;
+    constexpr auto _0 = additive_identity<T>;
     auto cos = std::cos(radians);
     auto sin = std::sin(radians);
     // clang-format off
@@ -83,7 +83,7 @@ Matrix<T> rotationByY(T radians) {
 template<typename T>
 Matrix<T> rotationByZ(T radians) {
     constexpr auto _1 = multiplicative_identity<T>;
-    constexpr auto _0 = addition_identity<T>;
+    constexpr auto _0 = additive_identity<T>;
     auto cos = std::cos(radians);
     auto sin = std::sin(radians);
     // clang-format off
