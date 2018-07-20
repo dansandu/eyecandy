@@ -25,7 +25,7 @@ public:
         rhs.rows_ = rhs.columns_ = 0;
     }
 
-    Matrix(size_type rows, size_type columns, value_type fillValue = addition_identity<value_type>)
+    Matrix(size_type rows, size_type columns, value_type fillValue = additive_identity<value_type>)
         : rows_{rows}, columns_{columns} {
         if (rows < 0 || columns < 0 || (rows != 0) != (columns != 0))
             throw std::runtime_error("matrix size must be greater or equal than zero");
