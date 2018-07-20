@@ -3,6 +3,8 @@
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
+#include <cmath>
+
 namespace dansandu {
 namespace eyecandy {
 namespace math {
@@ -35,7 +37,7 @@ Matrix<T> scaling(AA... args) {
 }
 
 template<int index, typename T>
-void translationWork(Matrix<T>& matrix) {}
+void translationWork(Matrix<T>&) {}
 
 template<int index, typename T, typename A, typename... AA>
 void translationWork(Matrix<T>& matrix, A arg, AA... args) {
@@ -48,6 +50,48 @@ Matrix<T> translation(AA... args) {
     auto result = identity<T>(sizeof...(AA) + 1);
     translationWork<0, T>(result, std::forward<AA>(args)...);
     return result;
+}
+
+template<typename T>
+Matrix<T> rotationByX(T radians) {
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = addition_identity<T>;
+    auto cos = std::cos(radians);
+    auto sin = std::sin(radians);
+    // clang-format off
+    return {{_1,  _0,   _0, _0},
+            {_0, cos, -sin, _0},
+            {_0, sin,  cos, _0},
+            {_0,  _0,   _0, _1}};
+    // clang-format on
+}
+
+template<typename T>
+Matrix<T> rotationByY(T radians) {
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = addition_identity<T>;
+    auto cos = std::cos(radians);
+    auto sin = std::sin(radians);
+    // clang-format off
+    return {{ cos, _0, sin, _0},
+            {  _0, _1,  _0, _0},
+            {-sin, _0, cos, _0},
+            {  _0, _0,  _0, _1}};
+    // clang-format on
+}
+
+template<typename T>
+Matrix<T> rotationByZ(T radians) {
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = addition_identity<T>;
+    auto cos = std::cos(radians);
+    auto sin = std::sin(radians);
+    // clang-format off
+    return {{cos, -sin, _0, _0},
+            {sin,  cos, _0, _0},
+            { _0,   _0, _1, _0},
+            { _0,   _0, _0, _1}};
+    // clang-format on
 }
 }
 }
