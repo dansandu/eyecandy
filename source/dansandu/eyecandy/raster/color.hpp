@@ -12,9 +12,9 @@ class Color {
 public:
     friend constexpr bool operator==(Color lhs, Color rhs) { return lhs.rgba_ == rhs.rgba_; }
 
-    constexpr Color() noexcept : rgba_{0U} {}
+    constexpr Color() noexcept : Color{Colors::black} {}
 
-    constexpr Color(uint32_t rgba) noexcept : rgba_{rgba} {}
+    constexpr explicit Color(uint32_t rgba) noexcept : rgba_{rgba} {}
 
     constexpr Color(Colors color) noexcept : rgba_{static_cast<uint32_t>(color)} {}
 
