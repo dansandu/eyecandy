@@ -2,6 +2,7 @@
 
 #include "dansandu/eyecandy/raster/color.hpp"
 
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -10,6 +11,11 @@ namespace eyecandy {
 namespace raster {
 
 class Image {
+    friend bool operator==(const Image& lhs, const Image& rhs) {
+        return lhs.width_ == rhs.width_ && lhs.height_ == rhs.height_ &&
+               std::equal(lhs.pixels_.begin(), lhs.pixels_.end(), rhs.pixels_.begin(), rhs.pixels_.end());
+    }
+
 public:
     using size_type = int;
 
@@ -59,6 +65,8 @@ private:
     size_type height_;
     std::vector<Color> pixels_;
 };
+
+inline bool operator!=(const Image& lhs, const Image& rhs) { return !(lhs == rhs); }
 }
 }
 }
