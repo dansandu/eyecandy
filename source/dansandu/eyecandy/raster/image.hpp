@@ -2,7 +2,6 @@
 
 #include "dansandu/eyecandy/raster/color.hpp"
 
-#include <iostream>
 #include <stdexcept>
 #include <vector>
 
