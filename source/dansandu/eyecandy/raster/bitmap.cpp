@@ -123,11 +123,11 @@ Image readBitmapFile(const std::string& path) {
             if (!readBytes(3))
                 throw BitmapReadException("color information is missing from pixel array");
 
-            uint32_t color = buffer[2];
-            (color <<= 8) |= buffer[1];
-            (color <<= 8) |= buffer[0];
-            (color <<= 8) |= 0xFF;
-            image.plot(j, i, color);
+            uint32_t colorCode = buffer[2];
+            (colorCode <<= 8) |= buffer[1];
+            (colorCode <<= 8) |= buffer[0];
+            (colorCode <<= 8) |= 0xFF;
+            image.plot(j, i, Color{colorCode});
             pixelArraySize += 3;
         }
         auto padding = (pixelArraySize % 4) ? 4 - (pixelArraySize % 4) : 0;

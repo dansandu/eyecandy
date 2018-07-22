@@ -14,13 +14,10 @@ TEST_CASE("Bitmap") {
             for (auto y = 0; y < chessboard.height(); ++y)
                 chessboard.plot(x, y, (x / squareSize + y / squareSize) % 2 ? Colors::white : Colors::turquoise);
 
-        constexpr auto bitmapFileName = "chessboard.bmp";
+        constexpr auto bitmapFileName = "resource/chessboard.bmp";
         writeBitmapFile(bitmapFileName, chessboard);
         Image readChessboard = readBitmapFile(bitmapFileName);
 
-        REQUIRE(chessboard.width() == readChessboard.width());
-        REQUIRE(chessboard.height() == readChessboard.height());
-        REQUIRE(std::equal(chessboard.pixelArray(), chessboard.pixelArray() + chessboard.width() * chessboard.height(),
-                           readChessboard.pixelArray()));
+        REQUIRE(chessboard == readChessboard);
     }
 }

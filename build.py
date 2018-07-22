@@ -20,6 +20,7 @@ if __name__ == '__main__':
              'source/dansandu/eyecandy/math/transformation.t.cpp',
              'source/dansandu/eyecandy/raster/image.t.cpp',
              'source/dansandu/eyecandy/raster/bitmap.cpp', 'source/dansandu/eyecandy/raster/bitmap.t.cpp',
+             'source/dansandu/eyecandy/raster/fragment.cpp', 'source/dansandu/eyecandy/raster/fragment.t.cpp',
              'source/dansandu/eyecandy/test.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
              '-Werror', '-Wall', '-Wextra',
@@ -27,7 +28,9 @@ if __name__ == '__main__':
 
     execute(['./target/eyecandy-test.exe'])
 
-    execute(['g++', 'source/dansandu/eyecandy/raster/bitmap.cpp', 'source/dansandu/eyecandy/main.cpp',
+    execute(['g++', 'source/dansandu/eyecandy/raster/bitmap.cpp',
+             'source/dansandu/eyecandy/raster/fragment.cpp',
+             'source/dansandu/eyecandy/main.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
              '-Werror', '-Wall', '-Wextra',
              '-o', 'target/eyecandy-main.exe'])
