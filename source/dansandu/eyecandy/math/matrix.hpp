@@ -4,6 +4,8 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -74,6 +76,19 @@ public:
         return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
                std::equal(data_.begin(), data_.end(), rhs.data_.begin(), rhs.data_.end(),
                           [epsilon](auto a, auto b) { return dansandu::eyecandy::math::closeTo(a, b, epsilon); });
+    }
+
+    std::string toString() const {
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(2);
+        for (auto i = 0u; i < data_.size(); ++i) {
+            ss << data_[i];
+            if ((i + 1) % columns_ == 0)
+                ss << std::endl;
+            else
+                ss << ", ";
+        }
+        return ss.str();
     }
 
 private:
