@@ -34,10 +34,10 @@ Mesh<T> sphere(T radius, int yResolution, int zResolution) {
         for (auto k = 0; k < zResolution; ++k) {
             auto index = k * yResolution + j + 1;
             auto yRadians = j * (pi<T> + pi<T>) / yResolution;
-            auto zRadians = (k + 1) * pi<T> / (zResolution + 1);
-            mesh.vertices(0, index) = radius * std::cos(zRadians + 0.5 * pi<T>) * std::cos(yRadians);
-            mesh.vertices(1, index) = radius * std::sin(zRadians + 0.5 * pi<T>);
-            mesh.vertices(2, index) = -radius * std::cos(zRadians + 0.5 * pi<T>) * std::sin(yRadians);
+            auto zRadians = (k + 1) * pi<T> / (zResolution + 1) + 0.5 * pi<T>;
+            mesh.vertices(0, index) = radius * std::cos(zRadians) * std::cos(yRadians);
+            mesh.vertices(1, index) = radius * std::sin(zRadians);
+            mesh.vertices(2, index) = -radius * std::cos(zRadians) * std::sin(yRadians);
             mesh.vertices(3, index) = multiplicative_identity<T>;
 
             if (k + 1 < zResolution) {
