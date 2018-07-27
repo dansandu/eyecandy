@@ -19,6 +19,9 @@ struct Mesh {
     Mesh(math::Matrix<T> vertices, math::Matrix<int> triangles)
         : vertices(std::move(vertices)), triangles(std::move(triangles)) {}
 
+    Mesh(Mesh&&) noexcept = default;
+    Mesh& operator=(Mesh&&) noexcept = default;
+
     math::Matrix<T> vertices;
     math::Matrix<int> triangles;
 };
