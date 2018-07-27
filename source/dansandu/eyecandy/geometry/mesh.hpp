@@ -8,10 +8,6 @@ namespace dansandu {
 namespace eyecandy {
 namespace geometry {
 
-struct Triangle {
-    int v0, v1, v2;
-};
-
 template<typename T>
 struct Mesh {
     Mesh() = default;
