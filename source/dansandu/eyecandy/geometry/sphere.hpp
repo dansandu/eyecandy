@@ -26,11 +26,11 @@ Mesh<T> sphere(T radius, int yResolution, int zResolution) {
     using dansandu::eyecandy::math::multiplicative_identity;
     using dansandu::eyecandy::math::pi;
 
-    auto vertexCount = yResolution * zResolution + 2;
     Mesh<T> mesh;
+    auto vertexCount = yResolution * zResolution + 2;
     mesh.vertices = Matrix<T>(4, vertexCount);
     for (auto j = 0; j < yResolution; ++j) {
-        mesh.triangles.push_back({0, j + 1, (j + 1) % yResolution + 1});
+        mesh.triangles.pushRow({0, j + 1, (j + 1) % yResolution + 1});
         for (auto k = 0; k < zResolution; ++k) {
             auto index = k * yResolution + j + 1;
             auto yRadians = j * (pi<T> + pi<T>) / yResolution;
@@ -41,14 +41,14 @@ Mesh<T> sphere(T radius, int yResolution, int zResolution) {
             mesh.vertices(3, index) = multiplicative_identity<T>;
 
             if (k + 1 < zResolution) {
-                mesh.triangles.push_back({k * yResolution + (j + 1) % yResolution + 1, k * yResolution + j + 1,
-                                          (k + 1) * yResolution + j + 1});
-                mesh.triangles.push_back({k * yResolution + (j + 1) % yResolution + 1, (k + 1) * yResolution + j + 1,
-                                          (k + 1) * yResolution + (j + 1) % yResolution + 1});
+                mesh.triangles.pushRow({k * yResolution + (j + 1) % yResolution + 1, k * yResolution + j + 1,
+                                        (k + 1) * yResolution + j + 1});
+                mesh.triangles.pushRow({k * yResolution + (j + 1) % yResolution + 1, (k + 1) * yResolution + j + 1,
+                                        (k + 1) * yResolution + (j + 1) % yResolution + 1});
             }
         }
-        mesh.triangles.push_back({(zResolution - 1) * yResolution + (j + 1) % yResolution + 1,
-                                  (zResolution - 1) * yResolution + j + 1, zResolution * yResolution + 1});
+        mesh.triangles.pushRow({(zResolution - 1) * yResolution + (j + 1) % yResolution + 1,
+                                (zResolution - 1) * yResolution + j + 1, zResolution * yResolution + 1});
     }
 
     mesh.vertices(1, 0) = radius;

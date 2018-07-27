@@ -16,11 +16,11 @@ template<typename T>
 struct Mesh {
     Mesh() = default;
 
-    Mesh(math::Matrix<T> vertices, std::vector<Triangle> triangles)
+    Mesh(math::Matrix<T> vertices, math::Matrix<int> triangles)
         : vertices(std::move(vertices)), triangles(std::move(triangles)) {}
 
     math::Matrix<T> vertices;
-    std::vector<Triangle> triangles;
+    math::Matrix<int> triangles;
 };
 }
 }
