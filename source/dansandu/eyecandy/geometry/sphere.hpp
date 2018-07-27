@@ -31,9 +31,9 @@ Mesh<T> sphere(T radius, int yResolution, int zResolution) {
     mesh.vertices = Matrix<T>(4, vertexCount);
     for (auto j = 0; j < yResolution; ++j) {
         mesh.triangles.pushRow({0, j + 1, (j + 1) % yResolution + 1});
+        auto yRadians = 2 * j * pi<T> / yResolution;
         for (auto k = 0; k < zResolution; ++k) {
             auto index = k * yResolution + j + 1;
-            auto yRadians = j * (pi<T> + pi<T>) / yResolution;
             auto zRadians = (k + 1) * pi<T> / (zResolution + 1) + 0.5 * pi<T>;
             mesh.vertices(0, index) = radius * std::cos(zRadians) * std::cos(yRadians);
             mesh.vertices(1, index) = radius * std::sin(zRadians);
