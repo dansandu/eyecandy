@@ -29,16 +29,16 @@ TEST_CASE("Matrix") {
     SECTION("empty construction") {
         Matrix<double> empty;
 
-        REQUIRE(empty.rows() == 0);
-        REQUIRE(empty.columns() == 0);
+        REQUIRE(empty.rowCount() == 0);
+        REQUIRE(empty.columnCount() == 0);
     }
 
     SECTION("fill construction") {
         Matrix<int> actual(2, 3, 7);
         Matrix<int> expected = {{7, 7, 7}, {7, 7, 7}};
 
-        REQUIRE(actual.rows() == 2);
-        REQUIRE(actual.columns() == 3);
+        REQUIRE(actual.rowCount() == 2);
+        REQUIRE(actual.columnCount() == 3);
         REQUIRE(expected.closeTo(actual, 0));
     }
 
@@ -69,8 +69,8 @@ TEST_CASE("Matrix") {
             auto copy = original;
             auto moved = std::move(copy);
 
-            REQUIRE(copy.rows() == 0);
-            REQUIRE(copy.columns() == 0);
+            REQUIRE(copy.rowCount() == 0);
+            REQUIRE(copy.columnCount() == 0);
 
             REQUIRE(moved.closeTo(original, 0));
         }
@@ -87,8 +87,8 @@ TEST_CASE("Matrix") {
             auto copy = original;
             another = std::move(copy);
 
-            REQUIRE(copy.rows() == 0);
-            REQUIRE(copy.columns() == 0);
+            REQUIRE(copy.rowCount() == 0);
+            REQUIRE(copy.columnCount() == 0);
 
             REQUIRE(another.closeTo(original, 0));
         }
@@ -109,7 +109,7 @@ TEST_CASE("Matrix") {
         REQUIRE(expected.closeTo(actual, 0));
     }
 
-    SECTION("adding rows") {
+    SECTION("adding rowCount") {
         Matrix<int> matrix;
 
         SECTION("can push arbitrary sized row to empty matrix") {
@@ -117,7 +117,7 @@ TEST_CASE("Matrix") {
 
             REQUIRE(matrix.closeTo({{1, 2, 3}}, 0));
 
-            SECTION("but must row size must match matrix columns for non-empty matrix") {
+            SECTION("but must row size must match matrix columnCount for non-empty matrix") {
                 REQUIRE_THROWS_AS(matrix.pushRow({1, 2}), std::invalid_argument);
 
                 matrix.pushRow({4, 5, 6});

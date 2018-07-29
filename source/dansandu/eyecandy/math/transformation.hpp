@@ -41,7 +41,7 @@ void translationWork(Matrix<T>&) {}
 
 template<int index, typename T, typename A, typename... AA>
 void translationWork(Matrix<T>& matrix, A arg, AA... args) {
-    matrix(index, matrix.columns() - 1) = arg;
+    matrix(index, matrix.columnCount() - 1) = arg;
     translationWork<index + 1, T>(matrix, std::forward<AA>(args)...);
 }
 
