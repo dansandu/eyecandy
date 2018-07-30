@@ -108,4 +108,22 @@ TEST_CASE("Matrix") {
 
         REQUIRE(expected.closeTo(actual, 0));
     }
+
+    SECTION("adding rows") {
+        Matrix<int> matrix;
+
+        SECTION("can push arbitrary sized row to empty matrix") {
+            matrix.pushRow({1, 2, 3});
+
+            REQUIRE(matrix.closeTo({{1, 2, 3}}, 0));
+
+            SECTION("but must row size must match matrix columns for non-empty matrix") {
+                REQUIRE_THROWS_AS(matrix.pushRow({1, 2}), std::invalid_argument);
+
+                matrix.pushRow({4, 5, 6});
+
+                REQUIRE(matrix.closeTo({{1, 2, 3}, {4, 5, 6}}, 0));
+            }
+        }
+    }
 }

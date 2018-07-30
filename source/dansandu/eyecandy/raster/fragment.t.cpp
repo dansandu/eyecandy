@@ -29,7 +29,7 @@ TEST_CASE("Fragment") {
             {30, 15}, {40, 11}, {50, 10}, {60, 11}, {70, 15}, {78, 22}, {85, 30}, {89, 40}};
         for (auto point : circlePoints)
             drawLine(actual, x0, y0, point.first, point.second, Colors::white);
-        auto expected = readBitmapFile("resource/expected_line_fragments.bmp");
+        auto expected = readBitmapFile("resource/expected_line.bmp");
 
         REQUIRE(actual == expected);
     }

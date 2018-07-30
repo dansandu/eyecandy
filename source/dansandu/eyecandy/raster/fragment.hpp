@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dansandu/eyecandy/geometry/mesh.hpp"
 #include "dansandu/eyecandy/raster/image.hpp"
 
 namespace dansandu {

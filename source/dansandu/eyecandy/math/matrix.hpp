@@ -4,6 +4,8 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -33,23 +35,30 @@ public:
         data_ = std::vector<value_type>(rows_ * columns_, fillValue);
     }
 
-    Matrix(std::initializer_list<std::initializer_list<value_type>> list) {
-        if ((rows_ = list.size()) != 0)
-            columns_ = list.begin()->size();
-        else
-            columns_ = 0;
-
+    Matrix(std::initializer_list<std::initializer_list<value_type>> list)
+        : rows_{static_cast<size_type>(list.size())},
+          columns_{rows_ ? static_cast<size_type>(list.begin()->size()) : 0} {
         for (auto row : list) {
-            data_.insert(data_.end(), row.begin(), row.end());
             if (columns_ != static_cast<size_type>(row.size()))
                 throw std::runtime_error("columns must be the same size");
+
+            data_.insert(data_.end(), row.begin(), row.end());
         }
     }
 
-    value_type& operator()(size_type row, size_type column) noexcept { return data_[columns_ * row + column]; }
+    value_type& operator()(size_type row, size_type column) noexcept { return data_[index(row, column)]; }
 
     value_type operator()(const size_type row, const size_type column) const noexcept {
-        return data_[columns_ * row + column];
+        return data_[index(row, column)];
+    }
+
+    void pushRow(const std::vector<value_type>& row) {
+        if (columns_ != static_cast<size_type>(row.size()) & columns_)
+            throw std::invalid_argument("row size must match matrix columns");
+
+        data_.insert(data_.end(), row.begin(), row.end());
+        ++rows_;
+        columns_ = row.size();
     }
 
     Matrix& operator=(const Matrix& rhs) = default;
@@ -76,7 +85,20 @@ public:
                           [epsilon](auto a, auto b) { return dansandu::eyecandy::math::closeTo(a, b, epsilon); });
     }
 
+    std::string toString() const {
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(2);
+        for (auto i = 0; i < rows_; ++i) {
+            for (auto j = 0; j < columns_; ++j)
+                ss << operator()(i, j) << " ";
+            ss << std::endl;
+        }
+        return ss.str();
+    }
+
 private:
+    size_type index(size_type row, size_type column) const { return row * columns_ + column; }
+
     size_type rows_;
     size_type columns_;
     std::vector<value_type> data_;
