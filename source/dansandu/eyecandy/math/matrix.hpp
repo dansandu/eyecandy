@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dansandu/eyecandy/math/matrix.hpp"
+#include "dansandu/eyecandy/math/matrix_view.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
 #include <algorithm>
@@ -19,28 +19,29 @@ public:
     using size_type = int;
     using value_type = T;
 
-    Matrix() : rows_{0}, columns_{0} {}
+    Matrix() : rowCount_{0}, columnCount_{0} {}
 
     Matrix(const Matrix& rhs) = default;
 
-    Matrix(Matrix&& rhs) noexcept : rows_{rhs.rows_}, columns_{rhs.columns_}, data_{std::move(rhs.data_)} {
-        rhs.rows_ = rhs.columns_ = 0;
+    Matrix(Matrix&& rhs) noexcept
+        : rowCount_{rhs.rowCount_}, columnCount_{rhs.columnCount_}, data_{std::move(rhs.data_)} {
+        rhs.rowCount_ = rhs.columnCount_ = 0;
     }
 
-    Matrix(size_type rows, size_type columns, value_type fillValue = additive_identity<value_type>)
-        : rows_{rows}, columns_{columns} {
-        if (rows < 0 || columns < 0 || (rows != 0) != (columns != 0))
+    Matrix(size_type rowCount, size_type columnCount, value_type fillValue = additive_identity<value_type>)
+        : rowCount_{rowCount}, columnCount_{columnCount} {
+        if (rowCount < 0 || columnCount < 0 || (rowCount != 0) != (columnCount != 0))
             throw std::runtime_error("matrix size must be greater or equal than zero");
 
-        data_ = std::vector<value_type>(rows_ * columns_, fillValue);
+        data_ = std::vector<value_type>(rowCount_ * columnCount_, fillValue);
     }
 
     Matrix(std::initializer_list<std::initializer_list<value_type>> list)
-        : rows_{static_cast<size_type>(list.size())},
-          columns_{rows_ ? static_cast<size_type>(list.begin()->size()) : 0} {
+        : rowCount_{static_cast<size_type>(list.size())},
+          columnCount_{rowCount_ ? static_cast<size_type>(list.begin()->size()) : 0} {
         for (auto row : list) {
-            if (columns_ != static_cast<size_type>(row.size()))
-                throw std::runtime_error("columns must be the same size");
+            if (columnCount_ != static_cast<size_type>(row.size()))
+                throw std::runtime_error("columnCount must be the same size");
 
             data_.insert(data_.end(), row.begin(), row.end());
         }
@@ -53,73 +54,77 @@ public:
     }
 
     void pushRow(const std::vector<value_type>& row) {
-        if (columns_ != static_cast<size_type>(row.size()) & columns_)
-            throw std::invalid_argument("row size must match matrix columns");
+        if (columnCount_ != static_cast<size_type>(row.size()) & columnCount_)
+            throw std::invalid_argument("row size must match matrix columnCount");
 
         data_.insert(data_.end(), row.begin(), row.end());
-        ++rows_;
-        columns_ = row.size();
+        ++rowCount_;
+        columnCount_ = row.size();
     }
 
     Matrix& operator=(const Matrix& rhs) = default;
 
     Matrix& operator=(Matrix&& rhs) noexcept {
         if (this != &rhs) {
-            rows_ = rhs.rows_;
-            columns_ = rhs.columns_;
+            rowCount_ = rhs.rowCount_;
+            columnCount_ = rhs.columnCount_;
             data_ = std::move(rhs.data_);
-            rhs.rows_ = rhs.columns_ = 0;
+            rhs.rowCount_ = rhs.columnCount_ = 0;
         }
         return *this;
     }
 
-    Matrix& operator*=(const Matrix& rhs);
+    Matrix& operator*=(const Matrix& rhs) { return *this = *this * rhs; }
 
-    size_type rows() const noexcept { return rows_; }
+    size_type rowCount() const noexcept { return rowCount_; }
 
-    size_type columns() const noexcept { return columns_; }
+    size_type columnCount() const noexcept { return columnCount_; }
+
+    auto rows() const { return rowView(data_.begin(), rowCount_, columnCount_); }
+
+    auto columns() const { return columnView(data_.begin(), rowCount_, columnCount_); }
 
     bool closeTo(const Matrix& rhs, value_type epsilon) const {
-        return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
+        return rowCount_ == rhs.rowCount_ && columnCount_ == rhs.columnCount_ &&
                std::equal(data_.begin(), data_.end(), rhs.data_.begin(), rhs.data_.end(),
                           [epsilon](auto a, auto b) { return dansandu::eyecandy::math::closeTo(a, b, epsilon); });
     }
 
     std::string toString() const {
         std::stringstream ss;
-        ss << std::fixed << std::setprecision(2);
-        for (auto i = 0; i < rows_; ++i) {
-            for (auto j = 0; j < columns_; ++j)
-                ss << operator()(i, j) << " ";
-            ss << std::endl;
-        }
+        ss << std::fixed << std::setprecision(2) << *this;
         return ss.str();
     }
 
 private:
-    size_type index(size_type row, size_type column) const { return row * columns_ + column; }
+    size_type index(size_type row, size_type column) const { return row * columnCount_ + column; }
 
-    size_type rows_;
-    size_type columns_;
+    size_type rowCount_;
+    size_type columnCount_;
     std::vector<value_type> data_;
 };
 
 template<typename T>
 Matrix<T> operator*(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    if (lhs.columns() != rhs.rows())
-        throw std::runtime_error("left hand side matrix columns do not match right hand side matrix rows");
+    if (lhs.columnCount() != rhs.rowCount())
+        throw std::runtime_error("left hand side matrix columnCount do not match right hand side matrix rowCount");
 
-    Matrix<T> result(lhs.rows(), rhs.columns());
-    for (auto i = 0; i < lhs.rows(); ++i)
-        for (auto k = 0; k < rhs.columns(); ++k)
-            for (auto j = 0; j < lhs.columns(); ++j)
+    Matrix<T> result(lhs.rowCount(), rhs.columnCount());
+    for (auto i = 0; i < lhs.rowCount(); ++i)
+        for (auto k = 0; k < rhs.columnCount(); ++k)
+            for (auto j = 0; j < lhs.columnCount(); ++j)
                 result(i, k) += lhs(i, j) * rhs(j, k);
     return result;
 }
 
 template<typename T>
-Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& rhs) {
-    return *this = *this * rhs;
+std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
+    for (auto row : matrix.rows()) {
+        for (auto element : row)
+            os << element << " ";
+        os << std::endl;
+    }
+    return os;
 }
 }
 }
