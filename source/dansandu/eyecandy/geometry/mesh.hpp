@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dansandu/eyecandy/math/matrix.hpp"
+#include "Eigen/Core"
 
 #include <vector>
 
@@ -12,14 +12,14 @@ template<typename T>
 struct Mesh {
     Mesh() = default;
 
-    Mesh(math::Matrix<T> vertices, math::Matrix<int> triangles)
-        : vertices(std::move(vertices)), triangles(std::move(triangles)) {}
+    Mesh(const Eigen::Matrix<T, 4, Eigen::Dynamic>& vertices, const Eigen::Matrix<int, 3, Eigen::Dynamic>& triangles)
+        : vertices(vertices), triangles(triangles) {}
 
     Mesh(Mesh&&) noexcept = default;
     Mesh& operator=(Mesh&&) noexcept = default;
 
-    math::Matrix<T> vertices;
-    math::Matrix<int> triangles;
+    Eigen::Matrix<T, 4, Eigen::Dynamic> vertices;
+    Eigen::Matrix<int, 3, Eigen::Dynamic> triangles;
 };
 }
 }
