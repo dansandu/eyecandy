@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Eigen/Core"
+#include "Eigen/Dense"
 #include "dansandu/eyecandy/geometry/mesh.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"

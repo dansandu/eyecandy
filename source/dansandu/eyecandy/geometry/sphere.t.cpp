@@ -1,6 +1,6 @@
 #include "catch/catch.hpp"
 
-#include "Eigen/Core"
+#include "Eigen/Dense"
 
 #include "dansandu/eyecandy/geometry/sphere.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"

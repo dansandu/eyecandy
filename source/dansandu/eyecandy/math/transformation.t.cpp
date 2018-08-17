@@ -2,6 +2,8 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"
 
+#include <iostream>
+
 using dansandu::eyecandy::math::closeTo;
 using dansandu::eyecandy::math::lookAt;
 using dansandu::eyecandy::math::pi;
@@ -74,7 +76,20 @@ TEST_CASE("Transformation") {
     }
 
     SECTION("Look at") {
-        // auto actual = lookAt<double>({0.0, 50.0, 0.0, 1.0}, {0.0, 1.0, 1.0, 1.0}, {0.0, 1.0, 0.0, 1.0});
-        // auto expected = Eigen::Matrix<double>{};
+        Eigen::Matrix<double, 3, 1> eye, target, up;
+        eye << 1.8, 1.3, 1.9;
+        target << 0.0, 0.0, 0.0;
+        up << 0.0, 1.0, 0.0;
+
+        Eigen::Matrix<double, 4, 4> expected;
+        // clang-format off
+        expected <<  0.726,   0.0, -0.687,    0.0,
+                    -0.305, 0.895, -0.322,    0.0,
+                     0.615, 0.444,  0.650, -2.922,
+                       0.0,   0.0,    0.0,    1.0;
+        auto actual = lookAt<double>(eye, target, up);
+        // clang-format on
+
+        REQUIRE(closeTo(actual, expected, 10e-2));
     }
 }

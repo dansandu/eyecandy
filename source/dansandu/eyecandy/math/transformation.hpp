@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Eigen/Core"
+#include "Eigen/Dense"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 
 #include <cmath>
@@ -86,16 +86,20 @@ auto rotationByZ(T radians) {
 }
 
 template<typename T>
-Eigen::Matrix<T, 4, 4> lookAt(const Eigen::Matrix<T, 4, 1>& eye, const Eigen::Matrix<T, 4, 1>& target,
-                              const Eigen::Matrix<T, 4, 1>& up) {
+auto lookAt(const Eigen::Matrix<T, 3, 1>& eye, const Eigen::Matrix<T, 3, 1>& target, const Eigen::Matrix<T, 3, 1>& up) {
     constexpr auto _1 = multiplicative_identity<T>;
     constexpr auto _0 = additive_identity<T>;
     auto z = (eye - target).normalized();
     auto x = up.cross(z).normalized();
     auto y = z.cross(x);
     Eigen::Matrix<T, 4, 4> result;
-    result << x, y, z, _0, _0, _0, _1;
-    return result * translation(-eye(0), -eye(1), -eye(2));
+    // clang-format off
+    result << x.transpose(), _0,
+              y.transpose(), _0,
+              z.transpose(), _0, 
+              _0, _0, _0, _1;
+    // clang-format on
+    return Eigen::Matrix<T, 4, 4>(result * translation(-eye(0), -eye(1), -eye(2)));
 }
 
 template<typename T, int M, int N>
