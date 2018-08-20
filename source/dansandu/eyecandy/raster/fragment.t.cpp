@@ -14,7 +14,6 @@ using dansandu::eyecandy::raster::drawLine;
 using dansandu::eyecandy::raster::drawWireframeMesh;
 using dansandu::eyecandy::raster::Image;
 using dansandu::eyecandy::raster::readBitmapFile;
-using dansandu::eyecandy::raster::writeBitmapFile;
 
 TEST_CASE("Fragment") {
     SECTION("draw line") {
