@@ -102,6 +102,21 @@ auto lookAt(const Eigen::Matrix<T, 3, 1>& eye, const Eigen::Matrix<T, 3, 1>& tar
     return Eigen::Matrix<T, 4, 4>(result * translation(-eye(0), -eye(1), -eye(2)));
 }
 
+template<typename T>
+auto perspective(T near, T far, T fieldOfViewRadians, T aspect) {
+    constexpr auto _1 = multiplicative_identity<T>;
+    constexpr auto _0 = additive_identity<T>;
+    auto ctg = _1 / std::tan(0.5 * fieldOfViewRadians);
+    Eigen::Matrix<T, 4, 4> result;
+    // clang-format off
+    result << ctg,           _0,                          _0,                              _0, 
+               _0, aspect * ctg,                          _0,                              _0,
+               _0,           _0, (far + near) / (near - far), 2.0 * far * near / (near - far),
+               _0,           _0,                         -_1,                              _0;
+    // clang-format on
+    return result;
+}
+
 template<typename T, int M, int N>
 bool closeTo(const Eigen::Matrix<T, M, N>& lhs, const Eigen::Matrix<T, M, N>& rhs, T epsilon) {
     return (lhs - rhs).norm() <= epsilon;

@@ -2,10 +2,9 @@
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"
 
-#include <iostream>
-
 using dansandu::eyecandy::math::closeTo;
 using dansandu::eyecandy::math::lookAt;
+using dansandu::eyecandy::math::perspective;
 using dansandu::eyecandy::math::pi;
 using dansandu::eyecandy::math::rotationByX;
 using dansandu::eyecandy::math::rotationByY;
@@ -63,7 +62,7 @@ TEST_CASE("Transformation") {
         REQUIRE(closeTo(actual, expected, 10e-15));
     }
 
-    SECTION("Rotation by Z axis") {
+    SECTION("rotation by Z axis") {
         auto actual = rotationByZ<double>(pi<double> / 2);
         Eigen::Matrix<double, 4, 4> expected;
         // clang-format off
@@ -75,7 +74,7 @@ TEST_CASE("Transformation") {
         REQUIRE(closeTo(actual, expected, 10e-15));
     }
 
-    SECTION("Look at") {
+    SECTION("look at") {
         Eigen::Matrix<double, 3, 1> eye, target, up;
         eye << 1.8, 1.3, 1.9;
         target << 0.0, 0.0, 0.0;
@@ -91,5 +90,16 @@ TEST_CASE("Transformation") {
         // clang-format on
 
         REQUIRE(closeTo(actual, expected, 10e-2));
+    }
+
+    SECTION("perspective") {
+        Eigen::Matrix<double, 4, 4> actual = perspective(1.0, 2000.0, 1.92, 1.5), expected;
+        // clang-format off
+        expected << 0.7,  0.0,  0.0,  0.0,
+                    0.0, 1.05,  0.0,  0.0,
+                    0.0,  0.0, -1.0, -2.0,
+                    0.0,  0.0, -1.0,  0.0;
+        // clang-format on
+        REQUIRE(closeTo(actual, expected, 10e-3));
     }
 }
