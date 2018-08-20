@@ -117,6 +117,12 @@ auto perspective(T near, T far, T fieldOfViewRadians, T aspect) {
     return result;
 }
 
+template<typename T>
+auto viewport(T width, T height) {
+    constexpr auto _1 = multiplicative_identity<T>;
+    return Eigen::Matrix<T, 4, 4>(translation<T>(width / 2, height / 2, -_1) * scaling<T>(width / 2, height / 2, _1));
+}
+
 template<typename T, int M, int N>
 bool closeTo(const Eigen::Matrix<T, M, N>& lhs, const Eigen::Matrix<T, M, N>& rhs, T epsilon) {
     return (lhs - rhs).norm() <= epsilon;

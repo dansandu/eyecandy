@@ -11,6 +11,7 @@ using dansandu::eyecandy::math::rotationByY;
 using dansandu::eyecandy::math::rotationByZ;
 using dansandu::eyecandy::math::scaling;
 using dansandu::eyecandy::math::translation;
+using dansandu::eyecandy::math::viewport;
 
 TEST_CASE("Transformation") {
 
@@ -101,5 +102,16 @@ TEST_CASE("Transformation") {
                     0.0,  0.0, -1.0,  0.0;
         // clang-format on
         REQUIRE(closeTo(actual, expected, 10e-3));
+    }
+
+    SECTION("viewport") {
+        Eigen::Matrix<double, 4, 4> actual = viewport(600.0, 400.0), expected;
+        // clang-format off
+        expected << 300.0,   0.0, 0.0, 300.0,
+                      0.0, 200.0, 0.0, 200.0,
+                      0.0,   0.0, 1.0,  -1.0,
+                      0.0,   0.0, 0.0,   1.0;
+        // clang-format on
+        REQUIRE(closeTo(actual, expected, 10e-15));
     }
 }
