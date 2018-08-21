@@ -35,4 +35,5 @@ if __name__ == '__main__':
              'source/dansandu/eyecandy/raster/fragment.cpp',
              'source/dansandu/eyecandy/main.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
-             '-Werror', '-Wall', '-Wextra'])
+             '-Werror', '-Wall', '-Wextra',
+             '-lsfml-graphics', '-lsfml-window', '-lsfml-system'])
