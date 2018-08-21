@@ -1,12 +1,17 @@
 #include "catch/catch.hpp"
+#include "dansandu/eyecandy/geometry/sphere.hpp"
+#include "dansandu/eyecandy/math/transformation.hpp"
 #include "dansandu/eyecandy/raster/bitmap.hpp"
 #include "dansandu/eyecandy/raster/colors.hpp"
 #include "dansandu/eyecandy/raster/fragment.hpp"
 
 #include <utility>
 
+using dansandu::eyecandy::geometry::sphere;
+using dansandu::eyecandy::math::translation;
 using dansandu::eyecandy::raster::Colors;
 using dansandu::eyecandy::raster::drawLine;
+using dansandu::eyecandy::raster::drawWireframeMesh;
 using dansandu::eyecandy::raster::Image;
 using dansandu::eyecandy::raster::readBitmapFile;
 
@@ -29,8 +34,17 @@ TEST_CASE("Fragment") {
             {30, 15}, {40, 11}, {50, 10}, {60, 11}, {70, 15}, {78, 22}, {85, 30}, {89, 40}};
         for (auto point : circlePoints)
             drawLine(actual, x0, y0, point.first, point.second, Colors::white);
-        auto expected = readBitmapFile("resource/expected_line.bmp");
 
-        REQUIRE(actual == expected);
+        REQUIRE(actual == readBitmapFile("resource/expected_line.bmp"));
+    }
+
+    SECTION("draw mesh") {
+        auto mySphere = sphere(20.0, 4, 4);
+        mySphere.vertices = translation(25.0, 25.0, 0.0) * mySphere.vertices;
+
+        Image actual{50, 50};
+        drawWireframeMesh(actual, mySphere, Colors::turquoise);
+
+        REQUIRE(actual == readBitmapFile("resource/expected_mesh.bmp"));
     }
 }
