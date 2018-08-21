@@ -53,7 +53,7 @@ int main() {
             pipeline * rotationByY(elapsed.count() % 5000 / 5000.0 * 2.0 * pi<double>) * mySphere.vertices;
         sphereCopy.vertices.dehomogenize();
         pixels.clear();
-        drawMeshWireframe(pixels, sphereCopy, Colors::red);
+        drawMeshWireframe(pixels, sphereCopy, Colors::magenta);
 
         texture.update(pixels.pixelArray());
         window.clear();
