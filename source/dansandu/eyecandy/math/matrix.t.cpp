@@ -133,4 +133,10 @@ TEST_CASE("Matrix") {
 
         REQUIRE((a - b).closeTo({{-6, -4}, {8, -12}}, 0));
     }
+
+    SECTION("multiplication by a scalar") {
+        Matrix<int> matrix = {{0, 15}, {-4, 13}};
+
+        REQUIRE((matrix * 7).closeTo({{0, 105}, {-28, 91}}, 0));
+    }
 }
