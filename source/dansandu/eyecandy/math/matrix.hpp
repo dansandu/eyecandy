@@ -124,7 +124,7 @@ private:
             throw std::runtime_error{"must single index into a row or column matrix"};
 
         if (n < 0 || n >= static_cast<size_type>(data_.size()))
-            throw std::out_of_range{"matrix indexing is out of bound"};
+            throw std::out_of_range{"matrix indexing is out of bounds"};
 
         return n;
     }

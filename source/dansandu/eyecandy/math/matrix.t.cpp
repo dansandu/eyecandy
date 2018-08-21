@@ -122,9 +122,15 @@ TEST_CASE("Matrix") {
     }
 
     SECTION("homogenized") {
-        Matrix<double> vertices = {{2, 15}, {4, 20}, {2, 5}};
+        Matrix<int> vertices = {{2, 15}, {4, 20}, {2, 5}};
 
         vertices.dehomogenize();
         REQUIRE(vertices.closeTo({{1, 3}, {2, 4}, {1, 1}}, 0));
+    }
+
+    SECTION("subtraction") {
+        Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
+
+        REQUIRE((a - b).closeTo({{-6, -4}, {8, -12}}, 0));
     }
 }
