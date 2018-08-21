@@ -8,8 +8,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include <iostream>
-
 namespace dansandu {
 namespace eyecandy {
 namespace math {
@@ -79,6 +77,15 @@ public:
     auto& operator()(size_type n) { return data_[index(n)]; }
 
     auto& operator()(size_type row, size_type column) { return data_[index(row, column)]; }
+
+    auto dehomogenize() {
+        for (auto i = 0; i + 1 < rows(); ++i)
+            for (auto j = 0; j < columns(); ++j)
+                operator()(i, j) = operator()(i, j) / operator()(rows() - 1, j);
+
+        for (auto j = 0; j < columns(); ++j)
+            operator()(rows() - 1, j) = 1.0;
+    }
 
     auto swap(Matrix& other) noexcept {
         using std::swap;
@@ -170,17 +177,6 @@ auto swap(Matrix<T>& lhs, Matrix<T>& rhs) {
 }
 
 template<typename T>
-auto magnitude(const Matrix<T>& matrix) {
-    if (matrix.rows() != 1 && matrix.columns() != 1)
-        throw std::invalid_argument{"matrix must be a row or column vector"};
-
-    auto result = additive_identity<T>;
-    for (auto element : matrix)
-        result += element * element;
-    return std::sqrt(result);
-}
-
-template<typename T>
 auto operator*(const Matrix<T>& matrix, T scalar) {
     Matrix<T> result = matrix;
     return result *= scalar;
@@ -193,89 +189,31 @@ auto operator*(T scalar, const Matrix<T>& matrix) {
 }
 
 template<typename T>
-auto normalize(const Matrix<T>& matrix) {
+auto magnitude(const Matrix<T>& matrix) {
+    if (matrix.rows() != 1 && matrix.columns() != 1)
+        throw std::invalid_argument{"matrix must be a row or column vector"};
+
+    auto result = additive_identity<T>;
+    for (auto element : matrix)
+        result += element * element;
+    return std::sqrt(result);
+}
+
+template<typename T>
+auto normalized(const Matrix<T>& matrix) {
     return (multiplicative_identity<T> / magnitude(matrix)) * matrix;
 }
 
 template<typename T>
-auto composeWork(Matrix<T>&, int, int, int) {}
-
-template<typename T, typename... AA>
-auto composeWork(Matrix<T>& result, int xOffset, int yOffset, int lastColumnSize, const Matrix<T>& matrix,
-                 AA&&... args) {
-    if (xOffset + matrix.columns() <= result.columns() && yOffset + matrix.rows() <= result.rows() ||
-        lastColumnSize != -1 && lastColumnSize != matrix.rows()) {
-        lastColumnSize = matrix.rows();
-        for (auto y = 0; y < matrix.rows(); ++y)
-            for (auto x = 0; x < matrix.columns(); ++x)
-                result(xOffset + x, yOffset + y) = matrix(x, y);
-        xOffset += matrix.columns();
-        if (xOffset == result.columns()) {
-            yOffset += matrix.rows();
-            if (yOffset < result.rows()) {
-                xOffset = 0;
-                lastColumnSize = -1;
-            }
-        }
-    } else
-        throw std::invalid_argument{"failed to compose elements into a matrix"};
-
-    composeWork(result, xOffset, yOffset, lastColumnSize, std::forward<AA>(args)...);
-}
-
-template<typename T, typename... AA>
-auto composeWork(Matrix<T>& result, int xOffset, int yOffset, int lastColumnSize, T scalar, AA&&... args) {
-    if (xOffset + 1 <= result.columns() && yOffset + 1 <= result.rows() ||
-        lastColumnSize != -1 && lastColumnSize != 1) {
-        lastColumnSize = 1;
-        result(xOffset, yOffset) = scalar;
-        ++xOffset;
-        if (xOffset == result.columns()) {
-            ++yOffset;
-            if (yOffset < result.rows()) {
-                xOffset = 0;
-                lastColumnSize = -1;
-            }
-        }
-    } else
-        throw std::invalid_argument{"failed to compose elements into a matrix"};
-
-    composeWork(result, xOffset, yOffset, lastColumnSize, std::forward<AA>(args)...);
-}
-
-template<typename T, typename... AA>
-auto compose(int rows, int columns, AA&&... args) {
-    Matrix<T> result(rows, columns);
-    composeWork(result, 0, 0, -1, std::forward<AA>(args)...);
-    return result;
-}
-
-template<typename T>
 auto crossProduct(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    if (lhs.rows() != 1 && lhs.columns() != 1)
-        throw std::invalid_argument{"left hand side must be a row or column vector"};
-
-    if (rhs.rows() != 1 && rhs.columns() != 1)
-        throw std::invalid_argument{"right hand side must be a row or column vector"};
-
-    if (lhs.rows() * lhs.columns() != 3 || rhs.rows() * rhs.columns() != 3)
-        throw std::invalid_argument{"vectors must have the length equal to 3"};
+    if ((lhs.rows() != 1 && lhs.columns() != 1) || (rhs.rows() != 1 && rhs.columns() != 1))
+        throw std::invalid_argument{"matrices must be row or column vectors"};
 
     // clang-format off
     return Matrix<T>{lhs(1) * rhs(2) - rhs(1) * lhs(2),
                      rhs(0) * lhs(2) - lhs(0) * rhs(2),
                      lhs(0) * rhs(1) - lhs(1) * rhs(0)};
     // clang-format on
-}
-
-template<typename T>
-auto dehomogenize(Matrix<T>& matrix) {
-    for (auto i = 0; i + 1 < matrix.rows(); ++i)
-        for (auto j = 0; j < matrix.columns(); ++j)
-            matrix(i, j) = matrix(i, j) / matrix(matrix.rows() - 1, j);
-
-    for (auto j = 0; j < matrix.columns(); ++j)
-        matrix(matrix.rows() - 1, j) = 1.0;
 }
 }
 }

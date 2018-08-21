@@ -47,7 +47,7 @@ public:
 
     Color color(size_type x, size_type y) const { return pixels_[index(x, y)]; }
 
-    auto fill(Color color = Colors::black) { std::fill(pixels_.begin(), pixels_.end(), color); };
+    auto clear(Color color = Colors::black) { std::fill(pixels_.begin(), pixels_.end(), color); };
 
     size_type width() const noexcept { return width_; }
 

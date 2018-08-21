@@ -6,7 +6,7 @@
 
 using dansandu::eyecandy::math::crossProduct;
 using dansandu::eyecandy::math::Matrix;
-using dansandu::eyecandy::math::normalize;
+using dansandu::eyecandy::math::normalized;
 
 TEST_CASE("Matrix") {
 
@@ -112,12 +112,19 @@ TEST_CASE("Matrix") {
     SECTION("normalization") {
         Matrix<double> vector = {3.0, 4.0, 2.0};
 
-        REQUIRE(normalize(vector).closeTo({0.557, 0.742, 0.371}, 1e-3));
+        REQUIRE(normalized(vector).closeTo({0.557, 0.742, 0.371}, 1e-3));
     }
 
     SECTION("cross product") {
         Matrix<double> vector = {1.0, 0.0, 0.0};
 
         REQUIRE(crossProduct(vector, {0.0, 1.0, 0.0}).closeTo({0.0, 0.0, 1.0}, 1e-15));
+    }
+
+    SECTION("homogenized") {
+        Matrix<double> vertices = {{2, 15}, {4, 20}, {2, 5}};
+
+        vertices.dehomogenize();
+        REQUIRE(vertices.closeTo({{1, 3}, {2, 4}, {1, 1}}, 0));
     }
 }

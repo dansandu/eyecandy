@@ -10,7 +10,6 @@
 
 using dansandu::eyecandy::geometry::Mesh;
 using dansandu::eyecandy::geometry::sphere;
-using dansandu::eyecandy::math::dehomogenize;
 using dansandu::eyecandy::math::lookAt;
 using dansandu::eyecandy::math::Matrix;
 using dansandu::eyecandy::math::perspective;
@@ -52,8 +51,8 @@ int main() {
 
         sphereCopy.vertices =
             pipeline * rotationByY(elapsed.count() % 5000 / 5000.0 * 2.0 * pi<double>) * mySphere.vertices;
-        dehomogenize(sphereCopy.vertices);
-        pixels.fill();
+        sphereCopy.vertices.dehomogenize();
+        pixels.clear();
         drawMeshWireframe(pixels, sphereCopy, Colors::red);
 
         texture.update(pixels.pixelArray());

@@ -76,8 +76,8 @@ template<typename T>
 auto lookAt(const Matrix<T>& eye, const Matrix<T>& target, const Matrix<T>& up) {
     constexpr auto _1 = multiplicative_identity<T>;
     constexpr auto _0 = additive_identity<T>;
-    auto z = normalize(eye - target);
-    auto x = normalize(crossProduct(up, z));
+    auto z = normalized(eye - target);
+    auto x = normalized(crossProduct(up, z));
     auto y = crossProduct(z, x);
 
     return Matrix<T>{{x(0), x(1), x(2), _0},
