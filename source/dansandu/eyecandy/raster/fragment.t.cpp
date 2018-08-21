@@ -11,7 +11,7 @@ using dansandu::eyecandy::geometry::sphere;
 using dansandu::eyecandy::math::translation;
 using dansandu::eyecandy::raster::Colors;
 using dansandu::eyecandy::raster::drawLine;
-using dansandu::eyecandy::raster::drawWireframeMesh;
+using dansandu::eyecandy::raster::drawMeshWireframe;
 using dansandu::eyecandy::raster::Image;
 using dansandu::eyecandy::raster::readBitmapFile;
 
@@ -43,7 +43,7 @@ TEST_CASE("Fragment") {
         mySphere.vertices = translation(25.0, 25.0, 0.0) * mySphere.vertices;
 
         Image actual{50, 50};
-        drawWireframeMesh(actual, mySphere, Colors::turquoise);
+        drawMeshWireframe(actual, mySphere, Colors::turquoise);
 
         REQUIRE(actual == readBitmapFile("resource/expected_mesh.bmp"));
     }

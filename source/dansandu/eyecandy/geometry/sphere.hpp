@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Eigen/Dense"
 #include "dansandu/eyecandy/geometry/mesh.hpp"
+#include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"
 
@@ -23,13 +23,14 @@ Mesh<T> sphere(T radius, int yResolution, int zResolution) {
         throw std::invalid_argument("z resolution must be one or more");
 
     using dansandu::eyecandy::math::additive_identity;
+    using dansandu::eyecandy::math::Matrix;
     using dansandu::eyecandy::math::multiplicative_identity;
     using dansandu::eyecandy::math::pi;
 
     auto vertexCount = yResolution * zResolution + 2;
     auto triangleCount = 2 * yResolution * zResolution;
-    Eigen::Matrix<T, 4, Eigen::Dynamic> vertices(4, vertexCount);
-    Eigen::Matrix<int, 3, Eigen::Dynamic> triangles(3, triangleCount);
+    Matrix<T> vertices(4, vertexCount);
+    Matrix<int> triangles(3, triangleCount);
     auto triangleIndex = 0;
     for (auto j = 0; j < yResolution; ++j) {
         triangles(0, triangleIndex) = 0;
