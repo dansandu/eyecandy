@@ -14,12 +14,12 @@ void drawMeshWireframe(Image& image, const geometry::Mesh<T>& mesh, Color color)
     const auto& ts = mesh.triangles;
     const auto& vs = mesh.vertices;
 
-    for (auto j = 0; j < ts.columns(); ++j)
-        for (auto i = 0; i < ts.rows(); ++i) {
-            auto x0 = vs(0, ts(i, j));
-            auto x1 = vs(1, ts(i, j));
-            auto y0 = vs(0, ts((i + 1) % 3, j));
-            auto y1 = vs(1, ts((i + 1) % 3, j));
+    for (auto triangle = 0; triangle < ts.rows(); ++triangle)
+        for (auto vertex = 0; vertex < ts.columns(); ++vertex) {
+            auto x0 = vs(ts(triangle, vertex), 0);
+            auto x1 = vs(ts(triangle, vertex), 1);
+            auto y0 = vs(ts(triangle, (vertex + 1) % ts.columns()), 0);
+            auto y1 = vs(ts(triangle, (vertex + 1) % ts.columns()), 1);
             drawLine(image, x0, x1, y0, y1, color);
         }
 }

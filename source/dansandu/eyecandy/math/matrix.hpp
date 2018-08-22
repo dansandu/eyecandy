@@ -46,6 +46,9 @@ public:
         }
     }
 
+    Matrix(size_type rowCount, size_type columnCount, std::vector<value_type> buffer)
+        : rows_{rowCount}, columns_{columnCount}, data_{std::move(buffer)} {}
+
     Matrix<T>& operator=(const Matrix& rhs) = default;
 
     auto& operator=(Matrix&& rhs) noexcept {
@@ -74,17 +77,23 @@ public:
         return *this;
     }
 
+    auto& operator+=(const Matrix& other) {
+        if (rows_ != other.rows_ || columns_ != other.columns_)
+            throw std::invalid_argument{"matrix dimensions must match"};
+
+        std::transform(data_.begin(), data_.end(), other.data_.begin(), data_.begin(),
+                       [](auto a, auto b) { return a + b; });
+        return *this;
+    }
+
     auto& operator()(size_type n) { return data_[index(n)]; }
 
     auto& operator()(size_type row, size_type column) { return data_[index(row, column)]; }
 
     auto dehomogenize() {
-        for (auto i = 0; i + 1 < rows(); ++i)
+        for (auto i = 0; i < rows(); ++i)
             for (auto j = 0; j < columns(); ++j)
-                operator()(i, j) = operator()(i, j) / operator()(rows() - 1, j);
-
-        for (auto j = 0; j < columns(); ++j)
-            operator()(rows() - 1, j) = 1.0;
+                operator()(i, j) = operator()(i, j) / operator()(i, columns() - 1);
     }
 
     auto swap(Matrix& other) noexcept {
@@ -101,6 +110,11 @@ public:
     auto rows() const { return rows_; }
 
     auto columns() const { return columns_; }
+
+    auto row(size_type n) const {
+        auto offset = data_.begin() + index(n, 0);
+        return Matrix<T>(1, columns(), std::vector<value_type>(offset, offset + columns()));
+    }
 
     auto closeTo(const Matrix& rhs, value_type epsilon) const {
         return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
@@ -161,6 +175,12 @@ auto operator-(const Matrix<T>& lhs, const Matrix<T>& rhs) {
 }
 
 template<typename T>
+auto operator+(const Matrix<T>& lhs, const Matrix<T>& rhs) {
+    auto result = lhs;
+    return result += rhs;
+}
+
+template<typename T>
 auto& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     for (auto i = 0; i < matrix.rows(); ++i) {
         auto j = 0;
@@ -186,6 +206,11 @@ template<typename T>
 auto operator*(T scalar, const Matrix<T>& matrix) {
     Matrix<T> result = matrix;
     return result *= scalar;
+}
+
+template<typename T>
+auto operator-(const Matrix<T>& matrix) {
+    return matrix * -multiplicative_identity<T>;
 }
 
 template<typename T>

@@ -122,10 +122,10 @@ TEST_CASE("Matrix") {
     }
 
     SECTION("homogenized") {
-        Matrix<int> vertices = {{2, 15}, {4, 20}, {2, 5}};
+        Matrix<int> vertices = {{15, 3}, {4, 2}, {2, 2}};
 
         vertices.dehomogenize();
-        REQUIRE(vertices.closeTo({{1, 3}, {2, 4}, {1, 1}}, 0));
+        REQUIRE(vertices.closeTo({{5, 1}, {2, 1}, {1, 1}}, 0));
     }
 
     SECTION("subtraction") {
@@ -138,5 +138,19 @@ TEST_CASE("Matrix") {
         Matrix<int> matrix = {{0, 15}, {-4, 13}};
 
         REQUIRE((matrix * 7).closeTo({{0, 105}, {-28, 91}}, 0));
+    }
+
+    SECTION("row indexing") {
+        Matrix<int> matrix = {{0, 1}, {2, 3}, {4, 5}};
+
+        REQUIRE(matrix.row(0).closeTo({{0, 1}}, 0));
+        REQUIRE(matrix.row(1).closeTo({{2, 3}}, 0));
+        REQUIRE(matrix.row(2).closeTo({{4, 5}}, 0));
+    }
+
+    SECTION("addition") {
+        Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
+
+        REQUIRE((a + b).closeTo({{18, 8}, {12, 26}}, 0));
     }
 }

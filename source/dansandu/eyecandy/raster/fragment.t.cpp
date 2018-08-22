@@ -40,7 +40,7 @@ TEST_CASE("Fragment") {
 
     SECTION("draw mesh") {
         auto mySphere = sphere(20.0, 4, 4);
-        mySphere.vertices = translation(25.0, 25.0, 0.0) * mySphere.vertices;
+        mySphere.vertices = mySphere.vertices * translation(25.0, 25.0, 0.0);
 
         Image actual{50, 50};
         drawMeshWireframe(actual, mySphere, Colors::turquoise);

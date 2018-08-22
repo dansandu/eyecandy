@@ -1,5 +1,6 @@
 #include "SFML/Graphics.hpp"
 
+#include "dansandu/eyecandy/geometry/clipping.hpp"
 #include "dansandu/eyecandy/geometry/sphere.hpp"
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/transformation.hpp"
@@ -8,6 +9,7 @@
 
 #include <chrono>
 
+using dansandu::eyecandy::geometry::clip;
 using dansandu::eyecandy::geometry::Mesh;
 using dansandu::eyecandy::geometry::sphere;
 using dansandu::eyecandy::math::lookAt;
@@ -15,6 +17,7 @@ using dansandu::eyecandy::math::Matrix;
 using dansandu::eyecandy::math::perspective;
 using dansandu::eyecandy::math::pi;
 using dansandu::eyecandy::math::rotationByY;
+using dansandu::eyecandy::math::scaling;
 using dansandu::eyecandy::math::translation;
 using dansandu::eyecandy::math::viewport;
 using dansandu::eyecandy::raster::Colors;
@@ -36,8 +39,7 @@ int main() {
     Matrix<double> eye{0.0, 0.0, 0.0}, target{0.0, 0.0, -300.0}, up{0.0, 1.0, 0.0}, spherePosition{0.0, 0.0, -300.0};
 
     auto mySphere = sphere(150.0, 10, 10), sphereCopy = mySphere;
-    auto pipeline = viewport<double>(resolution.first, resolution.second) * perspective(1.0, 2000.0, 1.92, 1.5) *
-                    lookAt(eye, target, up);
+    auto pipeline = lookAt(eye, target, up) * perspective(1.0, 2000.0, 1.92, 1.5);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -74,9 +76,12 @@ int main() {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
 
-        sphereCopy.vertices = pipeline * translation(spherePosition(0), spherePosition(1), spherePosition(2)) *
-                              rotationByY(elapsed.count() % 5000 / 5000.0 * 2.0 * pi<double>) * mySphere.vertices;
+        sphereCopy.vertices = mySphere.vertices * rotationByY(elapsed.count() % 5000 / 5000.0 * 2.0 * pi<double>) *
+                              translation(spherePosition) * pipeline;
+        sphereCopy = clip(sphereCopy);
         sphereCopy.vertices.dehomogenize();
+        sphereCopy.vertices =
+            mySphere.vertices * scaling(0.5, 0.5, 0.5) * viewport<double>(resolution.first, resolution.second);
         pixels.clear();
         drawMeshWireframe(pixels, sphereCopy, Colors::magenta);
 
