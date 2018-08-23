@@ -10,11 +10,11 @@ namespace raster {
 void drawLine(Image& image, int x0, int y0, int x1, int y1, Color color);
 
 template<typename T>
-void drawWireframeMesh(Image& image, const geometry::Mesh<T>& mesh, Color color) {
+void drawMeshWireframe(Image& image, const geometry::Mesh<T>& mesh, Color color) {
     const auto& ts = mesh.triangles;
     const auto& vs = mesh.vertices;
 
-    for (auto j = 0; j < ts.cols(); ++j)
+    for (auto j = 0; j < ts.columns(); ++j)
         for (auto i = 0; i < ts.rows(); ++i) {
             auto x0 = vs(0, ts(i, j));
             auto x1 = vs(1, ts(i, j));

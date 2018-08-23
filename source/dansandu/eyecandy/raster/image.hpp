@@ -2,6 +2,7 @@
 
 #include "dansandu/eyecandy/raster/color.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 #include <vector>
 
@@ -45,6 +46,8 @@ public:
     void plot(size_type x, size_type y, Color color) { pixels_[index(x, y)] = color; }
 
     Color color(size_type x, size_type y) const { return pixels_[index(x, y)]; }
+
+    auto clear(Color color = Colors::black) { std::fill(pixels_.begin(), pixels_.end(), color); };
 
     size_type width() const noexcept { return width_; }
 
