@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
+#include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -27,10 +28,8 @@ public:
     }
 
     Matrix(size_type rowCount, size_type columnCount, value_type fillValue = additive_identity<value_type>)
-        : rows_{rowCount}, columns_{columnCount} {
-        if (rows_ < 0 || columns_ < 0 || (rows_ != 0) != (columns_ != 0))
-            throw std::invalid_argument{"matrix size must be greater or equal than zero"};
-        data_ = std::vector<value_type>(rows_ * columns_, fillValue);
+        : Matrix(rowCount, columnCount, std::vector<value_type>()) {
+        data_ = std::vector<value_type>(rowCount * columnCount, fillValue);
     }
 
     Matrix(std::initializer_list<value_type> column)
@@ -41,13 +40,26 @@ public:
           columns_{rows_ ? static_cast<size_type>(list.begin()->size()) : 0} {
         for (auto row : list) {
             if (columns_ != static_cast<size_type>(row.size()))
-                throw std::invalid_argument{"columnCount must be the same size"};
+                THROW(std::invalid_argument,
+                      "conflicting sizes for rows provided in matrix constructor (# was expected but # was provided) "
+                      "-- rows must have the same size",
+                      columns_, row.size());
             data_.insert(data_.end(), row.begin(), row.end());
         }
     }
 
     Matrix(size_type rowCount, size_type columnCount, std::vector<value_type> buffer)
-        : rows_{rowCount}, columns_{columnCount}, data_{std::move(buffer)} {}
+        : rows_{rowCount}, columns_{columnCount}, data_{std::move(buffer)} {
+        if (rows_ < 0 || columns_ < 0)
+            THROW(std::invalid_argument,
+                  "invalid dimensions #x# provided in matrix constructor -- rows and columns must be greater than or "
+                  "equal to zero",
+                  rowCount, columnCount);
+        if (rows_ == 0 || columns_ == 0) {
+            rows_ = columns_ = 0;
+            data_.clear();
+        }
+    }
 
     Matrix<T>& operator=(const Matrix& rhs) = default;
 
@@ -70,7 +82,10 @@ public:
 
     auto& operator-=(const Matrix& other) {
         if (rows_ != other.rows_ || columns_ != other.columns_)
-            throw std::invalid_argument{"matrix dimensions must match"};
+            THROW(std::invalid_argument,
+                  "cannot subtract right hand side #x# matrix from left hand side #x# matrix -- matrix dimensions must "
+                  "match",
+                  other.rows(), other.columns(), rows(), columns());
 
         std::transform(data_.begin(), data_.end(), other.data_.begin(), data_.begin(),
                        [](auto a, auto b) { return a - b; });
@@ -79,7 +94,10 @@ public:
 
     auto& operator+=(const Matrix& other) {
         if (rows_ != other.rows_ || columns_ != other.columns_)
-            throw std::invalid_argument{"matrix dimensions must match"};
+            THROW(std::invalid_argument,
+                  "cannot add right hand side #x# matrix to left hand side #x# matrix -- matrix dimensions must "
+                  "match",
+                  other.rows(), other.columns(), rows(), columns());
 
         std::transform(data_.begin(), data_.end(), other.data_.begin(), data_.begin(),
                        [](auto a, auto b) { return a + b; });
@@ -135,17 +153,22 @@ public:
 private:
     auto index(size_type n) const {
         if (rows_ != 1 && columns_ != 1)
-            throw std::runtime_error{"must single index into a row or column matrix"};
+            THROW(std::runtime_error,
+                  "cannot single index the #th element in a #x# matrix -- matrix must be row or column vector", n,
+                  rows_, columns_);
 
         if (n < 0 || n >= static_cast<size_type>(data_.size()))
-            throw std::out_of_range{"matrix indexing is out of bounds"};
+            THROW(std::out_of_range, "cannot index the #th element in a #-lengthed vector -- index out of bounds", n,
+                  data_.size());
 
         return n;
     }
 
     auto index(size_type row, size_type column) const {
         if (row < 0 || row >= rows_ || column < 0 || column >= columns_)
-            throw std::out_of_range{"matrix indexing is out of bounds"};
+            THROW(std::out_of_range,
+                  "cannot index the #th row and #th column in a #x# matrix -- indices are out of bounds", row, column,
+                  rows_, columns_);
 
         return row * columns_ + column;
     }
@@ -158,7 +181,10 @@ private:
 template<typename T>
 auto operator*(const Matrix<T>& lhs, const Matrix<T>& rhs) {
     if (lhs.columns() != rhs.rows())
-        throw std::invalid_argument{"left hand side matrix columns do not match right hand side matrix rows"};
+        THROW(std::invalid_argument,
+              "cannot multiply left hand side #x# matrix with right hand side #x# matrix -- left hand side columns "
+              "must match right hand side rows",
+              lhs.rows(), lhs.columns(), rhs.rows(), rhs.columns());
 
     Matrix<T> result(lhs.rows(), rhs.columns());
     for (auto i = 0; i < lhs.rows(); ++i)
@@ -216,7 +242,8 @@ auto operator-(const Matrix<T>& matrix) {
 template<typename T>
 auto magnitude(const Matrix<T>& matrix) {
     if (matrix.rows() != 1 && matrix.columns() != 1)
-        throw std::invalid_argument{"matrix must be a row or column vector"};
+        THROW(std::invalid_argument, "cannot take the magnitude of a #x# matrix -- matrix must be row or column vector",
+              matrix.rows(), matrix.columns());
 
     auto result = additive_identity<T>;
     for (auto element : matrix)
@@ -231,8 +258,11 @@ auto normalized(const Matrix<T>& matrix) {
 
 template<typename T>
 auto crossProduct(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    if ((lhs.rows() != 1 && lhs.columns() != 1) || (rhs.rows() != 1 && rhs.columns() != 1))
-        throw std::invalid_argument{"matrices must be row or column vectors"};
+    if (lhs.rows() * lhs.columns() != 3 || rhs.rows() * rhs.columns() != 3)
+        THROW(std::invalid_argument,
+              "cannot take the cross product of two #x# and #x# matrices -- matrices must be row or column vectors of "
+              "length 3",
+              lhs.rows(), lhs.columns(), rhs.rows(), rhs.columns());
 
     // clang-format off
     return Matrix<T>{lhs(1) * rhs(2) - rhs(1) * lhs(2),

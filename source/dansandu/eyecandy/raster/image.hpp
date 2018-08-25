@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dansandu/eyecandy/raster/color.hpp"
+#include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -23,8 +24,14 @@ public:
 
     Image(size_type width, size_type height, Color fill = Color{})
         : width_{width}, height_{height}, pixels_(width * height, fill) {
-        if (width_ < 0 || height_ < 0 || (width_ != 0) != (height_ != 0))
-            throw std::runtime_error("matrix size must be greater or equal than zero");
+        if (width_ < 0 || height_ < 0)
+            THROW(std::invalid_argument,
+                  "invalid dimensions #x# provided in image constructor -- width and height must be greater than or "
+                  "equal to zero",
+                  width, height);
+
+        if (width_ == 0 || height_ == 0)
+            width_ = height_ = 0;
     }
 
     Image(const Image&) = default;
@@ -58,7 +65,8 @@ public:
 private:
     size_type index(size_type x, size_type y) const {
         if (x < 0 || x >= width_ || y < 0 || y >= height_)
-            throw std::out_of_range("coordinates exceed image bounds");
+            THROW(std::out_of_range, "cannot index the (#, #) pixel in an #x# image -- indices are out of bounds", x, y,
+                  width_, height_);
 
         return x + (height_ - y - 1) * width_;
     }

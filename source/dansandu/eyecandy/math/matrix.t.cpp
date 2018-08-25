@@ -43,8 +43,6 @@ TEST_CASE("Matrix") {
     }
 
     SECTION("bad construction") {
-        REQUIRE_THROWS_AS(Matrix<double>(0, 4), std::invalid_argument);
-        REQUIRE_THROWS_AS(Matrix<double>(3, 0), std::invalid_argument);
         REQUIRE_THROWS_AS(Matrix<double>(-2, 5), std::invalid_argument);
         REQUIRE_THROWS_AS(Matrix<double>(2, -5), std::invalid_argument);
     }
