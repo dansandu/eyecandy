@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dansandu/eyecandy/math/matrix.hpp"
+#include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <vector>
 
@@ -25,7 +26,23 @@ struct Mesh {
 
     Mesh& operator=(const Mesh&) = default;
 
-    auto vertex(size_type triangle, size_type index) const { return vertices.row(triangles(triangle, index)); }
+    auto vertex(size_type triangle, size_type index) const {
+        if (triangle < 0 || triangle >= triangles.rows())
+            THROW(std::invalid_argument, "cannot get the #th triangle from the mesh -- mesh only contains # triangles",
+                  triangle, triangles.rows());
+
+        if (index < 0 || index >= triangles.columns())
+            THROW(std::invalid_argument,
+                  "cannot get the #th vertex from the triangle -- triangle only contains # vertices", index,
+                  triangles.columns());
+
+        auto vertexIndex = triangles(triangle, index);
+        if (vertexIndex < 0 || vertexIndex >= vertices.rows())
+            THROW(std::invalid_argument, "cannot get the #th vertex from the mesh -- mesh only contains # vertices",
+                  vertexIndex, vertices.rows());
+
+        return vertices.row(vertexIndex);
+    }
 
     auto triangleCount() const { return triangles.rows(); }
 
