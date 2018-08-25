@@ -40,9 +40,9 @@ Mesh<T> clip(const Mesh<T>& mesh) {
 
         auto offset = static_cast<int>(vertices.size());
         for (auto i = 0; i < static_cast<int>(polygon.size()); ++i) {
-            vertices.insert(vertices.back(), polygon[i].begin(), polygon[i].end());
+            vertices.insert(vertices.end(), polygon[i].begin(), polygon[i].end());
             if (i > 1)
-                triangles.insert(triangles.back(), {offset, offset + i - 1, offset + i});
+                triangles.insert(triangles.end(), {offset, offset + i - 1, offset + i});
         }
     }
     return {{static_cast<int>(vertices.size()) / 4, 4, std::move(vertices)},

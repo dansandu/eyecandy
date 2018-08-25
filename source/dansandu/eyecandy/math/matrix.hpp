@@ -93,7 +93,7 @@ public:
     auto dehomogenize() {
         for (auto i = 0; i < rows(); ++i)
             for (auto j = 0; j < columns(); ++j)
-                operator()(i, j) = operator()(i, j) / operator()(i, columns() - 1);
+                operator()(i, j) /= operator()(i, columns() - 1);
     }
 
     auto swap(Matrix& other) noexcept {

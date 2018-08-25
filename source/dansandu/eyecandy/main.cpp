@@ -8,6 +8,7 @@
 #include "dansandu/eyecandy/raster/image.hpp"
 
 #include <chrono>
+#include <iostream>
 
 using dansandu::eyecandy::geometry::clip;
 using dansandu::eyecandy::geometry::Mesh;
@@ -39,7 +40,6 @@ int main() {
     Matrix<double> eye{0.0, 0.0, 0.0}, target{0.0, 0.0, -300.0}, up{0.0, 1.0, 0.0}, spherePosition{0.0, 0.0, -300.0};
 
     auto mySphere = sphere(150.0, 10, 10), sphereCopy = mySphere;
-    auto pipeline = lookAt(eye, target, up) * perspective(1.0, 2000.0, 1.92, 1.5);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -77,11 +77,10 @@ int main() {
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
 
         sphereCopy.vertices = mySphere.vertices * rotationByY(elapsed.count() % 5000 / 5000.0 * 2.0 * pi<double>) *
-                              translation(spherePosition) * pipeline;
-        sphereCopy = clip(sphereCopy);
+                              translation(spherePosition) * lookAt(eye, target, up) *
+                              perspective(1.0, 2000.0, 1.92, 1.5);
         sphereCopy.vertices.dehomogenize();
-        sphereCopy.vertices =
-            mySphere.vertices * scaling(0.5, 0.5, 0.5) * viewport<double>(resolution.first, resolution.second);
+        sphereCopy.vertices *= viewport<double>(resolution.first, resolution.second);
         pixels.clear();
         drawMeshWireframe(pixels, sphereCopy, Colors::magenta);
 
