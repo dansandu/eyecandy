@@ -119,13 +119,6 @@ TEST_CASE("Matrix") {
         REQUIRE(crossProduct(vector, {0.0, 1.0, 0.0}).closeTo({0.0, 0.0, 1.0}, 1e-15));
     }
 
-    SECTION("homogenized") {
-        Matrix<int> vertices = {{15, 3}, {4, 2}, {2, 2}};
-
-        vertices.dehomogenize();
-        REQUIRE(vertices.closeTo({{5, 1}, {2, 1}, {1, 1}}, 0));
-    }
-
     SECTION("subtraction") {
         Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
 
