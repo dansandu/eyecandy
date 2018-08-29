@@ -43,8 +43,6 @@ TEST_CASE("Matrix") {
     }
 
     SECTION("bad construction") {
-        REQUIRE_THROWS_AS(Matrix<double>(0, 4), std::invalid_argument);
-        REQUIRE_THROWS_AS(Matrix<double>(3, 0), std::invalid_argument);
         REQUIRE_THROWS_AS(Matrix<double>(-2, 5), std::invalid_argument);
         REQUIRE_THROWS_AS(Matrix<double>(2, -5), std::invalid_argument);
     }
@@ -121,13 +119,6 @@ TEST_CASE("Matrix") {
         REQUIRE(crossProduct(vector, {0.0, 1.0, 0.0}).closeTo({0.0, 0.0, 1.0}, 1e-15));
     }
 
-    SECTION("homogenized") {
-        Matrix<int> vertices = {{2, 15}, {4, 20}, {2, 5}};
-
-        vertices.dehomogenize();
-        REQUIRE(vertices.closeTo({{1, 3}, {2, 4}, {1, 1}}, 0));
-    }
-
     SECTION("subtraction") {
         Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
 
@@ -138,5 +129,19 @@ TEST_CASE("Matrix") {
         Matrix<int> matrix = {{0, 15}, {-4, 13}};
 
         REQUIRE((matrix * 7).closeTo({{0, 105}, {-28, 91}}, 0));
+    }
+
+    SECTION("row indexing") {
+        Matrix<int> matrix = {{0, 1}, {2, 3}, {4, 5}};
+
+        REQUIRE(matrix.row(0).closeTo({{0, 1}}, 0));
+        REQUIRE(matrix.row(1).closeTo({{2, 3}}, 0));
+        REQUIRE(matrix.row(2).closeTo({{4, 5}}, 0));
+    }
+
+    SECTION("addition") {
+        Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
+
+        REQUIRE((a + b).closeTo({{18, 8}, {12, 26}}, 0));
     }
 }
