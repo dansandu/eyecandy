@@ -3,6 +3,7 @@
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/raster/image.hpp"
 
+#include <ostream>
 #include <vector>
 
 namespace dansandu {
@@ -14,7 +15,12 @@ using dansandu::eyecandy::raster::Color;
 using dansandu::eyecandy::raster::Image;
 
 template<typename T>
-struct Mesh {
+class Mesh {
+    friend std::ostream& operator<<(std::ostream& os, const Mesh<T>& mesh) {
+        return os << "vertices:" << std::endl << mesh.vertices_ << "triangles:" << std::endl << mesh.triangles_;
+    }
+
+public:
     using size_type = typename Matrix<T>::size_type;
 
     Mesh() = default;
