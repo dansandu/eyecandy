@@ -42,3 +42,5 @@
 *.pyc
 
 thirdparties
+
+target
