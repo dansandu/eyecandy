@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     execute(['clang-format', '-i', '-style=file'] + files_to_format)
 
-    execute(['g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-test.exe',
+    execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-test.exe',
              'source/dansandu/eyecandy/math/matrix.t.cpp',
              'source/dansandu/eyecandy/math/transformation.t.cpp',
              'source/dansandu/eyecandy/raster/image.t.cpp',
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     execute(['./target/eyecandy-test.exe'])
 
-    execute(['g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-main.exe',
+    execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-main.exe',
              'source/dansandu/eyecandy/raster/bitmap.cpp',
              'source/dansandu/eyecandy/raster/fragment.cpp',
              'source/dansandu/eyecandy/main.cpp',
