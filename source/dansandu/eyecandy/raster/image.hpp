@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dansandu/eyecandy/math/point.hpp"
 #include "dansandu/eyecandy/raster/color.hpp"
 #include "dansandu/eyecandy/utility/exception.hpp"
 
@@ -19,6 +20,7 @@ class Image {
 
 public:
     using size_type = int;
+    using Point = dansandu::eyecandy::math::Point;
 
     Image() : width_{0}, height_{0} {}
 
@@ -50,7 +52,9 @@ public:
         return *this;
     }
 
-    void plot(size_type x, size_type y, Color color) { pixels_[index(x, y)] = color; }
+    auto plot(size_type x, size_type y, Color color) { pixels_[index(x, y)] = color; }
+
+    auto plot(Point point, Color color) { pixels_[index(point.x, point.y)] = color; }
 
     Color color(size_type x, size_type y) const { return pixels_[index(x, y)]; }
 

@@ -17,6 +17,7 @@ if __name__ == '__main__':
     execute(['clang-format', '-i', '-style=file'] + files_to_format)
 
     execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-test.exe',
+             'source/dansandu/eyecandy/math/point.t.cpp',
              'source/dansandu/eyecandy/math/matrix.t.cpp',
              'source/dansandu/eyecandy/math/transformation.t.cpp',
              'source/dansandu/eyecandy/raster/image.t.cpp',
