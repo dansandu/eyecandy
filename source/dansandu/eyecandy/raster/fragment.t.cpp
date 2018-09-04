@@ -95,5 +95,19 @@ TEST_CASE("Fragment") {
 
             REQUIRE(match);
         }
+
+        SECTION("flat bottom tip to the left") {
+            Point a{10, 90}, b{30, 10}, c{90, 10};
+            drawTriangle(a, b, c, whiteShader);
+            drawLine(a, b, overlayShader);
+            drawLine(a, c, overlayShader);
+            drawLine(b, c, overlayShader);
+
+            auto match = actual == readBitmapFile("resource/expected_flat_bottom_triangle_tip_to_the_left.bmp");
+            if (!match)
+                writeBitmapFile("target/actual_flat_bottom_triangle_tip_to_the_left.bmp", actual);
+
+            REQUIRE(match);
+        }
     }
 }

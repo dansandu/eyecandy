@@ -16,9 +16,10 @@ auto drawLine(math::Point a, math::Point b, Shader&& shader) {
 }
 
 template<typename Shader>
-auto drawFlatTopTriangle(math::Point bottom, math::Point leftTop, math::Point rightTop, Shader&& shader) {
-    LineTracer leftTracer{bottom, leftTop}, rightTracer{bottom, rightTop};
-    for (auto y = bottom.y; y <= leftTop.y; ++y) {
+auto drawFlatTriangle(math::Point tip, math::Point flatLeft, math::Point flatRight, Shader&& shader) {
+    auto dy = tip.y < flatLeft.y ? 1 : -1;
+    LineTracer leftTracer{tip, flatLeft}, rightTracer{tip, flatRight};
+    for (auto y = tip.y; y != flatLeft.y + dy; y += dy) {
         auto leftXbegin = leftTracer.position().x, leftXend = leftXbegin;
         auto rightXbegin = rightTracer.position().x, rightXend = rightXbegin;
 
@@ -37,7 +38,11 @@ template<typename Shader>
 void drawTriangle(math::Point a, math::Point b, math::Point c, Shader&& shader) {
     sortPointsByYx(a, b, c);
     if (b.y == c.y)
-        drawFlatTopTriangle(a, b, c, std::forward<Shader>(shader));
+        drawFlatTriangle(a, b, c, std::forward<Shader>(shader));
+    else if (a.y == b.y)
+        drawFlatTriangle(c, a, b, std::forward<Shader>(shader));
+    else {
+    }
 }
 }
 }
