@@ -22,7 +22,7 @@ if __name__ == '__main__':
              'source/dansandu/eyecandy/math/transformation.t.cpp',
              'source/dansandu/eyecandy/raster/image.t.cpp',
              'source/dansandu/eyecandy/raster/bitmap.cpp', 'source/dansandu/eyecandy/raster/bitmap.t.cpp',
-             'source/dansandu/eyecandy/raster/fragment.cpp', 'source/dansandu/eyecandy/raster/fragment.t.cpp',
+             'source/dansandu/eyecandy/raster/fragment.t.cpp',
              'source/dansandu/eyecandy/geometry/mesh.t.cpp',
              'source/dansandu/eyecandy/geometry/sphere.t.cpp',
              'source/dansandu/eyecandy/utility/string.t.cpp',
@@ -35,7 +35,6 @@ if __name__ == '__main__':
 
     execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-main.exe',
              'source/dansandu/eyecandy/raster/bitmap.cpp',
-             'source/dansandu/eyecandy/raster/fragment.cpp',
              'source/dansandu/eyecandy/main.cpp',
              '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
              '-Werror', '-Wall', '-Wextra',
