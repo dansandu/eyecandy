@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dansandu/eyecandy/math/matrix.hpp"
+#include "dansandu/eyecandy/raster/fragment.hpp"
 #include "dansandu/eyecandy/raster/image.hpp"
 
 #include <ostream>
@@ -81,13 +82,14 @@ public:
     }
 
     auto drawWireframe(Image& image, Color color) {
+        using dansandu::eyecandy::raster::drawLine;
         for (auto triangle = 0; triangle < triangles_.rows(); ++triangle)
             for (auto vertex = 0; vertex < triangles_.columns(); ++vertex) {
-                auto x0 = vertices_(triangles_(triangle, vertex), 0);
-                auto x1 = vertices_(triangles_(triangle, vertex), 1);
-                auto y0 = vertices_(triangles_(triangle, (vertex + 1) % triangles_.columns()), 0);
-                auto y1 = vertices_(triangles_(triangle, (vertex + 1) % triangles_.columns()), 1);
-                drawLine(image, x0, x1, y0, y1, color);
+                auto x0 = static_cast<int>(vertices_(triangles_(triangle, vertex), 0));
+                auto x1 = static_cast<int>(vertices_(triangles_(triangle, vertex), 1));
+                auto y0 = static_cast<int>(vertices_(triangles_(triangle, (vertex + 1) % triangles_.columns()), 0));
+                auto y1 = static_cast<int>(vertices_(triangles_(triangle, (vertex + 1) % triangles_.columns()), 1));
+                drawLine({x0, x1}, {y0, y1}, [&image, color](auto point) { image.plot(point, color); });
             }
     }
 
