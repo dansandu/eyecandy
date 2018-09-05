@@ -31,9 +31,9 @@ TEST_CASE("Fragment") {
         for (auto point : circlePoints)
             drawLine({50, 50}, point, whiteShader);
 
-        auto match = actual == readBitmapFile("resource/expected_fragment_line.bmp");
+        auto match = actual == readBitmapFile("resource/expected_line_fragment.bmp");
         if (!match)
-            writeBitmapFile("target/actual_fragment_line.bmp", actual);
+            writeBitmapFile("target/actual_line_fragment.bmp", actual);
 
         REQUIRE(match);
     }
@@ -106,6 +106,34 @@ TEST_CASE("Fragment") {
             auto match = actual == readBitmapFile("resource/expected_flat_bottom_triangle_tip_to_the_left.bmp");
             if (!match)
                 writeBitmapFile("target/actual_flat_bottom_triangle_tip_to_the_left.bmp", actual);
+
+            REQUIRE(match);
+        }
+
+        SECTION("flat bottom and middle tip") {
+            Point a{30, 20}, b{10, 10}, c{90, 10};
+            drawTriangle(a, b, c, whiteShader);
+            drawLine(a, b, overlayShader);
+            drawLine(a, c, overlayShader);
+            drawLine(b, c, overlayShader);
+
+            auto match = actual == readBitmapFile("resource/expected_flat_bottom_triangle_middle_tip.bmp");
+            if (!match)
+                writeBitmapFile("target/actual_flat_bottom_triangle_middle_tip.bmp", actual);
+
+            REQUIRE(match);
+        }
+
+        SECTION("obtuse triangle") {
+            Point a{10, 25}, b{30, 10}, c{95, 40};
+            drawTriangle(a, b, c, whiteShader);
+            drawLine(b, a, overlayShader);
+            drawLine(b, c, overlayShader);
+            drawLine(c, a, overlayShader);
+
+            auto match = actual == readBitmapFile("resource/expected_obtuse_triangle.bmp");
+            if (!match)
+                writeBitmapFile("target/actual_obtuse_triangle.bmp", actual);
 
             REQUIRE(match);
         }

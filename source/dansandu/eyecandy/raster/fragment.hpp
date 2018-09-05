@@ -36,13 +36,20 @@ auto drawFlatTriangle(math::Point tip, math::Point flatLeft, math::Point flatRig
 
 template<typename Shader>
 void drawTriangle(math::Point a, math::Point b, math::Point c, Shader&& shader) {
+    // TODO: use vertices instead of points
+    // we also need to interpolate on the Z axis for Z-buffering
     sortPointsByYx(a, b, c);
-    if (b.y == c.y)
-        drawFlatTriangle(a, b, c, std::forward<Shader>(shader));
-    else if (a.y == b.y)
+    if (a.y != b.y && b.y != c.y) {
+        auto x = static_cast<int>(static_cast<double>(b.y - a.y) * (c.x - a.x) / static_cast<double>(c.y - a.y) + a.x);
+        auto d = math::Point{x, b.y};
+        if (d.x < b.x)
+            d.swap(b);
+        drawFlatTriangle(a, b, d, shader);
+        drawFlatTriangle(c, b, d, shader);
+    } else if (a.y == b.y)
         drawFlatTriangle(c, a, b, std::forward<Shader>(shader));
-    else {
-    }
+    else
+        drawFlatTriangle(a, b, c, std::forward<Shader>(shader));
 }
 }
 }
