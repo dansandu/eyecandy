@@ -123,10 +123,13 @@ public:
 
     auto columns() const { return columns_; }
 
-    auto row(size_type n) const {
-        auto offset = data_.begin() + index(n, 0);
-        return Matrix<T>(1, columns(), std::vector<value_type>(offset, offset + columns()));
+    auto row(size_type n, std::pair<int, int> slice) const {
+        auto start = data_.begin() + index(n, 0) + slice.first;
+        auto end = start + slice.second;
+        return Matrix<T>(1, end - start, std::vector<value_type>(start, end));
     }
+
+    auto row(size_type n) const { return row(n, {0, columns()}); }
 
     auto closeTo(const Matrix& rhs, value_type epsilon) const {
         return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
