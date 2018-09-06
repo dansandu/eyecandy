@@ -5,6 +5,7 @@
 #include <vector>
 
 using dansandu::eyecandy::math::crossProduct;
+using dansandu::eyecandy::math::dotProduct;
 using dansandu::eyecandy::math::Matrix;
 using dansandu::eyecandy::math::normalized;
 
@@ -144,4 +145,6 @@ TEST_CASE("Matrix") {
 
         REQUIRE((a + b).closeTo({{18, 8}, {12, 26}}, 0));
     }
+
+    SECTION("dot product") { REQUIRE(dotProduct<double>({2.0, 11.0, 13.0}, {6.0, -2.0, 5.0}) == 55.0); }
 }

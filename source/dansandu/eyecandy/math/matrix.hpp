@@ -267,6 +267,22 @@ auto crossProduct(const Matrix<T>& lhs, const Matrix<T>& rhs) {
                      lhs(0) * rhs(1) - lhs(1) * rhs(0)};
     // clang-format on
 }
+
+template<typename T>
+auto dotProduct(const Matrix<T>& lhs, const Matrix<T>& rhs) {
+    if ((lhs.rows() != 1 && lhs.columns() != 1) || (rhs.rows() != 1 && rhs.columns() != 1) ||
+        lhs.rows() * lhs.columns() != rhs.rows() * rhs.columns())
+        THROW(std::invalid_argument,
+              "cannot take the dot product of two #x# and #x# matrices -- matrices must be row or column vectors of "
+              "the same length",
+              lhs.rows(), lhs.columns(), rhs.rows(), rhs.columns());
+
+    auto product = additive_identity<T>;
+    for (auto lhsItr = lhs.begin(), rhsItr = rhs.begin(); lhsItr != lhs.end(); ++lhsItr, ++rhsItr)
+        product += *lhsItr * *rhsItr;
+
+    return product;
+}
 }
 }
 }
