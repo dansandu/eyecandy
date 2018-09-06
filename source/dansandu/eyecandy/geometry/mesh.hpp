@@ -23,6 +23,7 @@ class Mesh {
 
 public:
     using size_type = typename Matrix<T>::size_type;
+    using Point = dansandu::eyecandy::math::Point;
 
     Mesh() = default;
 
@@ -91,6 +92,19 @@ public:
                 auto y1 = static_cast<int>(vertices_(triangles_(triangle, (vertex + 1) % triangles_.columns()), 1));
                 drawLine({x0, x1}, {y0, y1}, [&image, color](auto point) { image.plot(point, color); });
             }
+    }
+
+    auto draw(Image& image, Color color) {
+        using dansandu::eyecandy::raster::drawTriangle;
+        for (auto triangle = 0; triangle < triangles_.rows(); ++triangle) {
+            Point a{static_cast<int>(vertices_(triangles_(triangle, 0), 0)),
+                    static_cast<int>(vertices_(triangles_(triangle, 0), 1))},
+                b{static_cast<int>(vertices_(triangles_(triangle, 1), 0)),
+                  static_cast<int>(vertices_(triangles_(triangle, 1), 1))},
+                c{static_cast<int>(vertices_(triangles_(triangle, 2), 0)),
+                  static_cast<int>(vertices_(triangles_(triangle, 2), 1))};
+            drawTriangle(a, b, c, [&image, color](auto point) { image.plot(point, color); });
+        }
     }
 
     auto verticesCloseTo(const Matrix<T>& matrix, T epsilon) { return vertices_.closeTo(matrix, epsilon); }
