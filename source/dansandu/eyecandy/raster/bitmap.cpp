@@ -1,4 +1,5 @@
 #include "dansandu/eyecandy/raster/bitmap.hpp"
+#include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <algorithm>
 #include <climits>
@@ -93,35 +94,40 @@ Image readBitmapFile(const std::string& path) {
         return static_cast<bool>(file.read(reinterpret_cast<char*>(buffer), count));
     };
 
+    if (!file)
+        THROW(BitmapReadException, "file '#' does not exist", path);
+
     if (!readBytes(2) || buffer[0] != 0x42 || buffer[1] != 0x4D)
-        throw BitmapReadException("invalid magic words in header");
+        THROW(BitmapReadException, "invalid magic words in header -- 66 77 were expected instead of # #",
+              static_cast<int>(buffer[0]), static_cast<int>(buffer[1]));
 
     if (!readBytes(16)) // skip to width at offset 18
-        throw BitmapReadException("bytes 2-17 are missing from header");
+        THROW(BitmapReadException, "bytes 2-17 are missing from the header");
 
     if (!readBytes(4)) // read width
-        throw BitmapReadException("couldn't read width from header");
+        THROW(BitmapReadException, "couldn't read width from the header");
+
     auto readWidth = doubleWordLittleEndianUnion(buffer);
     if (readWidth > INT_MAX)
-        throw BitmapReadException("width is to large");
+        THROW(BitmapReadException, "width is too large");
     auto width = static_cast<int>(readWidth);
 
     if (!readBytes(4)) // read height
-        throw BitmapReadException("couldn't read height from header");
+        THROW(BitmapReadException, "couldn't read height from the header");
     auto readHeight = doubleWordLittleEndianUnion(buffer);
     if (readHeight > INT_MAX)
-        throw BitmapReadException("height is to large");
+        THROW(BitmapReadException, "height is too large");
     auto height = static_cast<int>(readHeight);
 
     if (!readBytes(28)) // skip to pixel array at offset 54
-        throw BitmapReadException("bytes 26-53 are missing from header");
+        THROW(BitmapReadException, "bytes 26-53 are missing from the header");
 
     auto image = Image{width, height};
     auto pixelArraySize = 0;
     for (auto i = 0; i < height; i++) {
         for (auto j = 0; j < width; j++) {
             if (!readBytes(3))
-                throw BitmapReadException("color information is missing from pixel array");
+                THROW(BitmapReadException, "color information is missing from the pixel array");
 
             uint32_t colorCode = buffer[2];
             (colorCode <<= 8) |= buffer[1];
@@ -133,7 +139,7 @@ Image readBitmapFile(const std::string& path) {
         auto padding = (pixelArraySize % 4) ? 4 - (pixelArraySize % 4) : 0;
         pixelArraySize += padding;
         if (!readBytes(padding))
-            throw BitmapReadException("some padding bytes are missing from pixel array");
+            THROW(BitmapReadException, "some padding bytes are missing from the pixel array");
     }
     return image;
 }

@@ -79,7 +79,7 @@ int main() {
         sphereCopy.dehomogenize();
         sphereCopy.transform(viewport<double>(resolution.first - 1, resolution.second - 1));
         pixels.clear();
-        sphereCopy.drawWireframe(pixels, Colors::magenta);
+        sphereCopy.draw(pixels, Colors::magenta);
         texture.update(pixels.pixelArray());
 
         window.clear();

@@ -11,7 +11,8 @@ namespace raster {
 
 class BitmapReadException : public std::runtime_error {
 public:
-    BitmapReadException(const char* message) : runtime_error{message} {}
+    explicit BitmapReadException(const char* message) : runtime_error{message} {}
+    explicit BitmapReadException(const std::string& message) : runtime_error{message} {}
 };
 
 Image readBitmapFile(const std::string& path);
