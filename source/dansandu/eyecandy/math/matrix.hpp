@@ -283,6 +283,15 @@ auto dotProduct(const Matrix<T>& lhs, const Matrix<T>& rhs) {
 
     return product;
 }
+
+template<typename T>
+auto transpose(const Matrix<T>& matrix) {
+    Matrix<T> result(matrix.columns(), matrix.rows());
+    for (auto i = 0; i < result.rows(); i++)
+        for (auto j = 0; j < result.columns(); j++)
+            result(i, j) = matrix(j, i);
+    return result;
+}
 }
 }
 }
