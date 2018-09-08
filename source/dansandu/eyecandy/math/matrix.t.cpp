@@ -8,6 +8,7 @@ using dansandu::eyecandy::math::crossProduct;
 using dansandu::eyecandy::math::dotProduct;
 using dansandu::eyecandy::math::Matrix;
 using dansandu::eyecandy::math::normalized;
+using dansandu::eyecandy::math::transpose;
 
 TEST_CASE("Matrix") {
 
@@ -147,4 +148,6 @@ TEST_CASE("Matrix") {
     }
 
     SECTION("dot product") { REQUIRE(dotProduct<double>({2.0, 11.0, 13.0}, {6.0, -2.0, 5.0}) == 55.0); }
+
+    SECTION("transpose") { REQUIRE(transpose<int>({{1, 2, 3}, {4, 5, 6}}).closeTo({{1, 4}, {2, 5}, {3, 6}}, 0)); }
 }
