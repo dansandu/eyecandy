@@ -82,6 +82,20 @@ public:
             vertices_ *= matrix;
     }
 
+    auto cull() {
+        constexpr auto _0 = dansandu::eyecandy::math::additive_identity<T>;
+        std::vector<int> triangles;
+        for (auto triangle = 0; triangle < triangles_.rows(); ++triangle) {
+            auto o = vertex(triangle, 2), u = vertex(triangle, 0) - o, v = vertex(triangle, 1) - o;
+            if (u(1) * v(0) - u(0) * v(1) < _0) {
+                auto face = triangles_.row(triangle);
+                triangles.insert(triangles.end(), face.begin(), face.end());
+            }
+        }
+        auto triangleCount = static_cast<int>(triangles.size()) / triangles_.columns();
+        triangles_ = Matrix<int>(triangleCount, triangles_.columns(), std::move(triangles));
+    }
+
     auto drawWireframe(Image& image, Color color) {
         using dansandu::eyecandy::raster::drawLine;
         for (auto triangle = 0; triangle < triangles_.rows(); ++triangle)

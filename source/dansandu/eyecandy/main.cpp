@@ -78,8 +78,9 @@ int main() {
         sphereCopy.clip();
         sphereCopy.dehomogenize();
         sphereCopy.transform(viewport<double>(resolution.first - 1, resolution.second - 1));
+        sphereCopy.cull();
         pixels.clear();
-        sphereCopy.draw(pixels, Colors::magenta);
+        sphereCopy.drawWireframe(pixels, Colors::magenta);
         texture.update(pixels.pixelArray());
 
         window.clear();
