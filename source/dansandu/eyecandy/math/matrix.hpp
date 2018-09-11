@@ -28,8 +28,14 @@ public:
     }
 
     Matrix(size_type rowCount, size_type columnCount, value_type fillValue = additive_identity<value_type>)
-        : Matrix(rowCount, columnCount, std::vector<value_type>()) {
-        data_ = std::vector<value_type>(rowCount * columnCount, fillValue);
+        : rows_{rowCount}, columns_{columnCount} {
+        if (rows_ < 0 || columns_ < 0)
+            THROW(std::invalid_argument,
+                  "invalid dimensions #x# provided in matrix constructor -- rows and columns must be greater than or "
+                  "equal to zero",
+                  rows_, columns_);
+
+        data_ = std::vector<T>(rows_ * columns_, fillValue);
     }
 
     Matrix(std::initializer_list<value_type> column)
@@ -55,6 +61,13 @@ public:
                   "invalid dimensions #x# provided in matrix constructor -- rows and columns must be greater than or "
                   "equal to zero",
                   rowCount, columnCount);
+
+        if (rows_ * columns_ != static_cast<int>(data_.size()))
+            THROW(std::invalid_argument,
+                  "invalid dimensions #x# provided in matrix constructor -- the buffer contains # elements but # were "
+                  "expected",
+                  rows_, columns_, data_.size(), rows_ * columns_);
+
         if (rows_ == 0 || columns_ == 0) {
             rows_ = columns_ = 0;
             data_.clear();
@@ -76,7 +89,8 @@ public:
     auto& operator*=(const Matrix& rhs) { return *this = *this * rhs; }
 
     auto& operator*=(value_type scalar) {
-        std::transform(data_.begin(), data_.end(), data_.begin(), [scalar](auto a) { return a * scalar; });
+        for (auto& element : data_)
+            element *= scalar;
         return *this;
     }
 
