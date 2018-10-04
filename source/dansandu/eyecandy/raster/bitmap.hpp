@@ -17,7 +17,7 @@ public:
 
 Image readBitmapFile(const std::string& path);
 
-void writeBitmapFile(const std::string& path, Image& image);
+void writeBitmapFile(const std::string& path, const Image& image);
 }
 }
 }
