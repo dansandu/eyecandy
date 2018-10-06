@@ -1,5 +1,6 @@
 import os
 import subprocess
+import argparse
 
 
 def execute(command):
@@ -9,6 +10,10 @@ def execute(command):
         raise RuntimeError(f'exited with status code {process.returncode}')
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Simple build command')
+    parser.add_argument('--skip-tests', dest='skip_tests', action='store_true', default=False)
+    args = parser.parse_args()
+
     files_to_format = []
     for path, _, files in os.walk('source'):
         source_files = [os.path.join(path, f) for f in files if f.endswith('.cpp') or f.endswith('.hpp')]
@@ -16,22 +21,23 @@ if __name__ == '__main__':
 
     execute(['clang-format', '-i', '-style=file'] + files_to_format)
 
-    execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-test.exe',
-             'source/dansandu/eyecandy/math/point.t.cpp',
-             'source/dansandu/eyecandy/math/matrix.t.cpp',
-             'source/dansandu/eyecandy/math/transformation.t.cpp',
-             'source/dansandu/eyecandy/raster/image.t.cpp',
-             'source/dansandu/eyecandy/raster/bitmap.cpp', 'source/dansandu/eyecandy/raster/bitmap.t.cpp',
-             'source/dansandu/eyecandy/raster/fragment.t.cpp',
-             'source/dansandu/eyecandy/geometry/mesh.t.cpp',
-             'source/dansandu/eyecandy/geometry/sphere.t.cpp',
-             'source/dansandu/eyecandy/utility/string.t.cpp',
-             'source/dansandu/eyecandy/test.cpp',
-             '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
-             '-Werror', '-Wall', '-Wextra',
-             ])
+    if not args.skip_tests:
+        execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-test.exe',
+                'source/dansandu/eyecandy/math/point.t.cpp',
+                'source/dansandu/eyecandy/math/matrix.t.cpp',
+                'source/dansandu/eyecandy/math/transformation.t.cpp',
+                'source/dansandu/eyecandy/raster/image.t.cpp',
+                'source/dansandu/eyecandy/raster/bitmap.cpp', 'source/dansandu/eyecandy/raster/bitmap.t.cpp',
+                'source/dansandu/eyecandy/raster/fragment.t.cpp',
+                'source/dansandu/eyecandy/geometry/mesh.t.cpp',
+                'source/dansandu/eyecandy/geometry/sphere.t.cpp',
+                'source/dansandu/eyecandy/utility/string.t.cpp',
+                'source/dansandu/eyecandy/test.cpp',
+                '-I/home/udantu/workspace/eyecandy/thirdparties', '-I/home/udantu/workspace/eyecandy/source',
+                '-Werror', '-Wall', '-Wextra',
+                ])
 
-    execute(['./target/eyecandy-test.exe'])
+        execute(['./target/eyecandy-test.exe'])
 
     execute(['scan-build', '-o', 'target/clang-analyzer', 'g++', '-std=c++1z', '-O3', '-o', 'target/eyecandy-main.exe',
              'source/dansandu/eyecandy/raster/bitmap.cpp',
