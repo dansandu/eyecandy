@@ -1,153 +1,120 @@
 #include "catch/catch.hpp"
 #include "dansandu/eyecandy/math/matrix.hpp"
 
-#include <stdexcept>
-#include <vector>
+#include <algorithm>
 
-using dansandu::eyecandy::math::crossProduct;
-using dansandu::eyecandy::math::dotProduct;
+using dansandu::eyecandy::math::additive_identity;
+using dansandu::eyecandy::math::dehomogenize;
+using dansandu::eyecandy::math::dynamic;
 using dansandu::eyecandy::math::Matrix;
-using dansandu::eyecandy::math::normalized;
-using dansandu::eyecandy::math::transpose;
+using dansandu::eyecandy::math::slicer;
 
-TEST_CASE("Matrix") {
+TEST_CASE("New Matrix") {
 
-    SECTION("closeness for integer values") {
-        Matrix<int> matrix{{1, 2, 3}, {4, 5, 6}};
-        Matrix<int> sameMatrix{{1, 2, 3}, {4, 5, 6}};
+    SECTION("default construction") {
+        Matrix<int, 3, 3> m;
 
-        REQUIRE(sameMatrix.closeTo(matrix, 0));
-        REQUIRE(!sameMatrix.closeTo(matrix, -1));
-    }
-
-    SECTION("closeness for floating point values") {
-        Matrix<double> matrix{{1.06, 2.0012, 3.0}, {4.00002, 5.005, 6.0068}};
-        Matrix<double> sameMatrix{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
-
-        REQUIRE(sameMatrix.closeTo(matrix, 0.1));
-        REQUIRE(!sameMatrix.closeTo(matrix, 0.01));
-    }
-
-    SECTION("empty construction") {
-        Matrix<double> empty;
-
-        REQUIRE(empty.rows() == 0);
-        REQUIRE(empty.columns() == 0);
+        REQUIRE(
+            std::all_of(std::begin(m), std::end(m), [](auto element) { return element == additive_identity<int>; }));
     }
 
     SECTION("fill construction") {
-        Matrix<int> actual(2, 3, 7);
-        Matrix<int> expected{{7, 7, 7}, {7, 7, 7}};
+        auto fillValue = 9;
+        Matrix<int, 3, 3> m{fillValue};
 
-        REQUIRE(actual.rows() == 2);
-        REQUIRE(actual.columns() == 3);
-        REQUIRE(expected.closeTo(actual, 0));
+        REQUIRE(std::all_of(std::begin(m), std::end(m), [fillValue](auto element) { return element == fillValue; }));
     }
 
-    SECTION("bad construction") {
-        REQUIRE_THROWS_AS(Matrix<double>(-2, 5), std::invalid_argument);
-        REQUIRE_THROWS_AS(Matrix<double>(2, -5), std::invalid_argument);
+    SECTION("buffer construction") {
+        std::vector<int> expected = {1, 2, 3, 4, 5, 6};
+        Matrix<int, dynamic, dynamic> m{2, 3, expected};
+
+        REQUIRE(std::equal(std::begin(expected), std::end(expected), std::begin(m), std::end(m)));
+        REQUIRE(m.rows() == 2);
+        REQUIRE(m.columns() == 3);
     }
 
-    SECTION("construction with initializer list") {
-        Matrix<int> actual{{0, 0, 0}, {0, 0, 0}};
-        Matrix<int> expected(2, 3);
+    SECTION("from array") {
+        int expected[] = {1, 2, 3, 4, 5, 6};
+        Matrix<int, 2, 3> m{{{1, 2, 3}, {4, 5, 6}}};
 
-        REQUIRE(actual.closeTo(expected, 0));
-    }
-
-    SECTION("copy and move semantics") {
-        Matrix<int> original{{1, 2, 3}, {4, 5, 6}};
-
-        SECTION("copy construction") {
-            auto copy = original;
-
-            REQUIRE(copy.closeTo(original, 0));
-        }
-
-        SECTION("move constrution") {
-            auto copy = original;
-            auto moved = std::move(copy);
-
-            REQUIRE(copy.rows() == 0);
-            REQUIRE(copy.columns() == 0);
-
-            REQUIRE(moved.closeTo(original, 0));
-        }
-
-        SECTION("copy assignment") {
-            Matrix<int> another(3, 5, 7);
-            another = original;
-
-            REQUIRE(another.closeTo(original, 0));
-        }
-
-        SECTION("move assignment") {
-            Matrix<int> another(3, 5, 7);
-            auto copy = original;
-            another = std::move(copy);
-
-            REQUIRE(copy.rows() == 0);
-            REQUIRE(copy.columns() == 0);
-
-            REQUIRE(another.closeTo(original, 0));
-        }
+        REQUIRE(std::equal(std::begin(expected), std::end(expected), std::begin(m), std::end(m)));
+        REQUIRE(m.rows() == 2);
+        REQUIRE(m.columns() == 3);
     }
 
     SECTION("multiplication") {
-        Matrix<int> expected{{82, 88}, {199, 214}};
-        auto actual = Matrix<int>{{1, 2, 3}, {4, 5, 6}} * Matrix<int>{{11, 12}, {13, 14}, {15, 16}};
+        Matrix<double, 4, 4> a{
+            {{1.0, 2.0, 3.0, 4.0}, {5.0, 6.0, 7.0, 8.0}, {9.0, 10.0, 11.0, 12.0}, {13.0, 14.0, 15.0, 16.0}}};
+        Matrix<double, 4, 4> b{
+            {{1.0, 0.0, 0.0, 0.0}, {0.0, 1.0, 0.0, 0.0}, {0.0, 0.0, 1.0, 0.0}, {0.0, 0.0, 0.0, 1.0}}};
+        Matrix<double, 4, 4> expected = a;
 
-        REQUIRE(expected.closeTo(actual, 0));
+        REQUIRE(expected.closeTo(a * b, 10e-10));
     }
 
-    SECTION("inplace multiplication") {
-        Matrix<int> expected{{82, 88}, {199, 214}};
-        Matrix<int> actual = {{1, 2, 3}, {4, 5, 6}};
-        actual *= Matrix<int>{{11, 12}, {13, 14}, {15, 16}};
+    SECTION("dynamic multiplicaton") {
+        Matrix<int, dynamic, 3> a{4, 3, {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}};
+        Matrix<int, 3, 3> b{{{2, 0, 0}, {0, 3, 0}, {0, 0, 4}}};
+        Matrix<int, dynamic, 3> expected{4, 3, {2, 0, 4, 2, 3, 4, 2, 0, 0, 0, 0, 0}};
 
-        REQUIRE(expected.closeTo(actual, 0));
+        REQUIRE(a * b == expected);
     }
 
-    SECTION("normalization") {
-        Matrix<double> vector = {3.0, 4.0, 2.0};
+    SECTION("scalar multiplication") {
+        Matrix<int, 1, 10> v{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}};
+        Matrix<int, 1, 10> expected{{5, 10, 15, 20, 25, 30, 35, 40, 45, 50}};
 
-        REQUIRE(normalized(vector).closeTo({0.557, 0.742, 0.371}, 1e-3));
-    }
-
-    SECTION("cross product") {
-        Matrix<double> vector = {1.0, 0.0, 0.0};
-
-        REQUIRE(crossProduct(vector, {0.0, 1.0, 0.0}).closeTo({0.0, 0.0, 1.0}, 1e-15));
-    }
-
-    SECTION("subtraction") {
-        Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
-
-        REQUIRE((a - b).closeTo({{-6, -4}, {8, -12}}, 0));
-    }
-
-    SECTION("multiplication by a scalar") {
-        Matrix<int> matrix = {{0, 15}, {-4, 13}};
-
-        REQUIRE((matrix * 7).closeTo({{0, 105}, {-28, 91}}, 0));
-    }
-
-    SECTION("row indexing") {
-        Matrix<int> matrix = {{0, 1}, {2, 3}, {4, 5}};
-
-        REQUIRE(matrix.row(0).closeTo({{0, 1}}, 0));
-        REQUIRE(matrix.row(1).closeTo({{2, 3}}, 0));
-        REQUIRE(matrix.row(2).closeTo({{4, 5}}, 0));
+        REQUIRE(v * 5 == expected);
     }
 
     SECTION("addition") {
-        Matrix<int> a = {{6, 2}, {10, 7}}, b = {{12, 6}, {2, 19}};
+        Matrix<int, 2, 2> a{{{6, 2}, {10, 7}}}, b{{{12, 6}, {2, 19}}}, expected{{{18, 8}, {12, 26}}};
 
-        REQUIRE((a + b).closeTo({{18, 8}, {12, 26}}, 0));
+        REQUIRE(a + b == expected);
     }
 
-    SECTION("dot product") { REQUIRE(dotProduct<double>({2.0, 11.0, 13.0}, {6.0, -2.0, 5.0}) == 55.0); }
+    SECTION("subtraction") {
+        Matrix<int, 2, 2> a{{{6, 2}, {10, 7}}}, b{{{12, 6}, {2, 19}}}, expected{{{-6, -4}, {8, -12}}};
 
-    SECTION("transpose") { REQUIRE(transpose<int>({{1, 2, 3}, {4, 5, 6}}).closeTo({{1, 4}, {2, 5}, {3, 6}}, 0)); }
+        REQUIRE(a - b == expected);
+    }
+
+    SECTION("closeness for floating point values") {
+        Matrix<double, 2, 3> a{{{1.06, 2.0012, 3.0}, {4.00002, 5.005, 6.0068}}}, b{{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}};
+
+        REQUIRE(a.closeTo(b, 0.1));
+        REQUIRE(!a.closeTo(b, 0.01));
+    }
+
+    SECTION("closeness for integer values") {
+        Matrix<int, 2, 3> a{{{1, 2, 3}, {4, 5, 6}}}, b{{{1, 2, 3}, {4, 5, 6}}};
+
+        REQUIRE(a.closeTo(b, 0));
+        REQUIRE(!a.closeTo(b, -1));
+    }
+
+    SECTION("slicing static matrix") {
+        Matrix<int, 2, 2> a{{{1, 2}, {3, 4}}};
+
+        REQUIRE(slicer<0, 1, 0, 2>::slice(a) == Matrix<int, 1, 2>{{1, 2}});
+        REQUIRE(slicer<dynamic, 1, 0, 2>::slice(a, 0) == Matrix<int, 1, 2>{{1, 2}});
+        REQUIRE(slicer<dynamic, 1, 0, 2>::slice(a, 1) == Matrix<int, 1, 2>{{3, 4}});
+    }
+
+    SECTION("slicing dynamic matrix") {
+        Matrix<int, dynamic, 3> a{4, 3, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}};
+
+        REQUIRE(slicer<dynamic, 1, 0, 3>::slice(a, 3) == Matrix<int, 1, 3>{{10, 11, 12}});
+        REQUIRE(slicer<dynamic, 2, 1, 2>::slice(a, 2) == Matrix<int, 2, 2>{{{8, 9}, {11, 12}}});
+        REQUIRE(slicer<0, dynamic, 0, 2>::slice(a, 4) == Matrix<int, dynamic, 2>{4, 2, {1, 2, 4, 5, 7, 8, 10, 11}});
+    }
+
+    SECTION("dehomogenize") {
+        Matrix<int, 2, 4> a{{{2, 4, 8, 2}, {3, 9, 27, 3}}};
+
+        dehomogenize(a);
+
+        REQUIRE(a == Matrix<int, 2, 4>{{{1, 2, 4, 1}, {1, 3, 9, 1}}});
+    }
 }
