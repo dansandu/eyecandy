@@ -32,7 +32,6 @@ if __name__ == '__main__':
                  'source/dansandu/eyecandy/raster/wireframe_rasterizer.t.cpp',
                  'source/dansandu/eyecandy/raster/line_tracer.t.cpp',
                  'source/dansandu/eyecandy/raster/bitmap.cpp', 'source/dansandu/eyecandy/raster/bitmap.t.cpp',
-                 'source/dansandu/eyecandy/geometry/mesh.t.cpp',
                  'source/dansandu/eyecandy/geometry/sphere.t.cpp',
                  'source/dansandu/eyecandy/geometry/clipping.t.cpp',
                  'source/dansandu/eyecandy/utility/string.t.cpp',
