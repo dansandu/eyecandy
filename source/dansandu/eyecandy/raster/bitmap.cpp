@@ -78,7 +78,7 @@ void writeBinaryFile(const std::string& path, std::vector<uint8_t>& bitmap) {
 }
 }
 
-void writeBitmapFile(const std::string& path, Image& image) {
+void writeBitmapFile(const std::string& path, const Image& image) {
     auto bitmap = std::vector<uint8_t>(pixelArrayOffset, 0);
     bitmapPixelArray(image, bitmap); // set the pixel array first because we need to know the
     bitmapHeader(image, bitmap);     // file size before setting the header

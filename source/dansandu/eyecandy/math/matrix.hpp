@@ -1,269 +1,158 @@
 #pragma once
 
+#include "dansandu/eyecandy/math/base_matrix.hpp"
+#include "dansandu/eyecandy/math/heap_matrix.hpp"
+#include "dansandu/eyecandy/math/matrix_slice.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
+#include "dansandu/eyecandy/math/stack_matrix.hpp"
 #include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <functional>
 #include <iomanip>
 #include <sstream>
-#include <stdexcept>
-#include <vector>
+#include <type_traits>
 
 namespace dansandu {
 namespace eyecandy {
 namespace math {
 
-template<typename T>
-class Matrix {
-public:
-    using size_type = int;
-    using value_type = T;
+template<typename T, size_type M, size_type N>
+auto closeTo(Matrix<T, M, N>& a, Matrix<T, M, N>& b, T epsilon) {
+    return a.closeTo(b, epsilon);
+}
 
-    Matrix() : rows_{0}, columns_{0} {}
+template<typename T, size_type M, size_type N>
+auto swap(Matrix<T, M, N>& a, Matrix<T, M, N>& b) {
+    a.swap(b);
+}
 
-    Matrix(const Matrix& rhs) = default;
+template<typename T, size_type M, size_type N>
+auto operator+(const Matrix<T, M, N>& a, const Matrix<T, M, N> b) {
+    auto result = a;
+    return result += b;
+}
 
-    Matrix(Matrix&& rhs) noexcept : rows_{rhs.rows_}, columns_{rhs.columns_}, data_{std::move(rhs.data_)} {
-        rhs.rows_ = rhs.columns_ = 0;
-    }
+template<typename T, size_type M, size_type N>
+auto operator-(const Matrix<T, M, N>& a, const Matrix<T, M, N> b) {
+    auto result = a;
+    return result -= b;
+}
 
-    Matrix(size_type rowCount, size_type columnCount, value_type fillValue = additive_identity<value_type>)
-        : Matrix(rowCount, columnCount, std::vector<value_type>()) {
-        data_ = std::vector<value_type>(rowCount * columnCount, fillValue);
-    }
+template<typename T, size_type M, size_type N>
+auto operator*(const Matrix<T, M, N>& matrix, T scalar) {
+    auto result = matrix;
+    return result *= scalar;
+}
 
-    Matrix(std::initializer_list<value_type> column)
-        : rows_{static_cast<size_type>(column.size())}, columns_{1}, data_(column) {}
+template<typename T, size_type M, size_type N>
+auto operator*(T scalar, const Matrix<T, M, N>& matrix) {
+    auto result = matrix;
+    return result *= scalar;
+}
 
-    Matrix(std::initializer_list<std::initializer_list<value_type>> list)
-        : rows_{static_cast<size_type>(list.size())},
-          columns_{rows_ ? static_cast<size_type>(list.begin()->size()) : 0} {
-        for (auto row : list) {
-            if (columns_ != static_cast<size_type>(row.size()))
-                THROW(std::invalid_argument,
-                      "conflicting sizes for rows provided in matrix constructor (# was expected but # was provided) "
-                      "-- rows must have the same size",
-                      columns_, row.size());
-            data_.insert(data_.end(), row.begin(), row.end());
-        }
-    }
+template<typename T, size_type M, size_type N, typename = std::enable_if_t<std::is_integral_v<T>>>
+auto operator==(const Matrix<T, M, N>& a, const Matrix<T, M, N> b) {
+    return a.rows() == b.rows() && a.columns() && b.columns() && std::equal(std::begin(a), std::end(a), std::begin(b));
+}
 
-    Matrix(size_type rowCount, size_type columnCount, std::vector<value_type> buffer)
-        : rows_{rowCount}, columns_{columnCount}, data_{std::move(buffer)} {
-        if (rows_ < 0 || columns_ < 0)
-            THROW(std::invalid_argument,
-                  "invalid dimensions #x# provided in matrix constructor -- rows and columns must be greater than or "
-                  "equal to zero",
-                  rowCount, columnCount);
-        if (rows_ == 0 || columns_ == 0) {
-            rows_ = columns_ = 0;
-            data_.clear();
-        }
-    }
+template<typename T, size_type M, size_type N, typename = std::enable_if_t<std::is_integral_v<T>>>
+auto operator!=(const Matrix<T, M, N>& a, const Matrix<T, M, N> b) {
+    return !(a == b);
+}
 
-    Matrix<T>& operator=(const Matrix& rhs) = default;
+template<typename T, size_type M, size_type N, size_type K>
+auto operator*(const Matrix<T, M, N>& a, const Matrix<T, N, K>& b) {
+    Matrix<T, M, K> result{a.rows(), b.columns()};
+    for (auto i = 0; i < a.rows(); ++i)
+        for (auto k = 0; k < b.columns(); ++k)
+            for (auto j = 0; j < a.columns(); ++j)
+                result(i, k) += a(i, j) * b(j, k);
 
-    auto& operator=(Matrix&& rhs) noexcept {
-        if (this != &rhs) {
-            rows_ = rhs.rows_;
-            columns_ = rhs.columns_;
-            data_ = std::move(rhs.data_);
-            rhs.rows_ = rhs.columns_ = 0;
-        }
-        return *this;
-    }
+    if constexpr (M == 1 && K == 1)
+        return result.x();
+    else
+        return result;
+}
 
-    auto& operator*=(const Matrix& rhs) { return *this = *this * rhs; }
+template<typename T, size_type M, size_type N>
+auto operator-(const Matrix<T, M, N>& matrix) {
+    constexpr auto _1 = dansandu::eyecandy::math::multiplicative_identity<T>;
+    return -_1 * matrix;
+}
 
-    auto& operator*=(value_type scalar) {
-        std::transform(data_.begin(), data_.end(), data_.begin(), [scalar](auto a) { return a * scalar; });
-        return *this;
-    }
+template<typename T, size_type M, size_type N, typename = std::enable_if_t<M == 1 || N == 1, T>>
+auto toString(const Matrix<T, M, N>& vector, size_type decimalPoints = 2) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(decimalPoints) << "(";
+    auto i = 0;
+    for (; i + 1 < std::max(M, N); ++i)
+        ss << vector(i) << ", ";
+    ss << vector(i) << ")";
+    return ss.str();
+}
 
-    auto& operator-=(const Matrix& other) {
-        if (rows_ != other.rows_ || columns_ != other.columns_)
-            THROW(std::invalid_argument,
-                  "cannot subtract right hand side #x# matrix from left hand side #x# matrix -- matrix dimensions must "
-                  "match",
-                  other.rows(), other.columns(), rows(), columns());
+template<typename T, size_type M, size_type N, typename = std::enable_if_t<M == 1 || N == 1, T>>
+auto normalized(const Matrix<T, M, N>& vector) {
+    auto _1 = dansandu::eyecandy::math::multiplicative_identity<T>;
+    return (_1 / magnitude(vector)) * vector;
+}
 
-        std::transform(data_.begin(), data_.end(), other.data_.begin(), data_.begin(),
-                       [](auto a, auto b) { return a - b; });
-        return *this;
-    }
+template<typename T, size_type M, size_type N, size_type K, size_type L,
+         typename = std::enable_if_t<(M == 1 || N == 1) && (K == 1 || L == 1) && M * N == K * L, T>>
+auto dotProduct(const Matrix<T, M, N>& a, const Matrix<T, K, L>& b) {
+    auto sum = dansandu::eyecandy::math::additive_identity<T>;
+    for (auto left = a.begin(), right = b.begin(); left != a.end(); ++left, ++right)
+        sum += *left * *right;
+    return sum;
+}
 
-    auto& operator+=(const Matrix& other) {
-        if (rows_ != other.rows_ || columns_ != other.columns_)
-            THROW(std::invalid_argument,
-                  "cannot add right hand side #x# matrix to left hand side #x# matrix -- matrix dimensions must "
-                  "match",
-                  other.rows(), other.columns(), rows(), columns());
+template<typename T, size_type M, size_type N, typename = std::enable_if_t<M == 1 || N == 1, T>>
+auto magnitude(const Matrix<T, M, N>& vector) {
+    return static_cast<T>(std::sqrt(dotProduct(vector, vector)));
+}
 
-        std::transform(data_.begin(), data_.end(), other.data_.begin(), data_.begin(),
-                       [](auto a, auto b) { return a + b; });
-        return *this;
-    }
+template<typename T, size_type M, size_type N, typename = std::enable_if_t<(M == 1 || N == 1) && M * N == 3, T>>
+auto crossProduct(const Matrix<T, M, N>& a, const Matrix<T, M, N>& b) {
+    auto x = a.y() * b.z() - b.y() * a.z();
+    auto y = b.x() * a.z() - a.x() * b.z();
+    auto z = a.x() * b.y() - b.x() * a.y();
+    return Matrix<T, M, N>{{x, y, z}};
+}
 
-    auto& operator()(size_type n) { return data_[index(n)]; }
-
-    auto& operator()(size_type row, size_type column) { return data_[index(row, column)]; }
-
-    auto swap(Matrix& other) noexcept {
-        using std::swap;
-        swap(rows_, other.rows_);
-        swap(columns_, other.columns_);
-        swap(data_, other.data_);
-    }
-
-    auto operator()(size_type n) const { return data_[index(n)]; }
-
-    auto operator()(const size_type row, const size_type column) const { return data_[index(row, column)]; }
-
-    auto rows() const { return rows_; }
-
-    auto columns() const { return columns_; }
-
-    auto row(size_type n) const {
-        auto offset = data_.begin() + index(n, 0);
-        return Matrix<T>(1, columns(), std::vector<value_type>(offset, offset + columns()));
-    }
-
-    auto closeTo(const Matrix& rhs, value_type epsilon) const {
-        return rows_ == rhs.rows_ && columns_ == rhs.columns_ &&
-               std::equal(data_.begin(), data_.end(), rhs.data_.begin(), rhs.data_.end(),
-                          [epsilon](auto a, auto b) { return dansandu::eyecandy::math::closeTo(a, b, epsilon); });
-    }
-
-    auto toString() const {
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << *this;
-        return ss.str();
-    }
-
-    auto begin() const { return data_.begin(); }
-
-    auto end() const { return data_.end(); }
-
-private:
-    auto index(size_type n) const {
-        if (rows_ != 1 && columns_ != 1)
-            THROW(std::runtime_error,
-                  "cannot single index the #th element in a #x# matrix -- matrix must be row or column vector", n,
-                  rows_, columns_);
-
-        if (n < 0 || n >= static_cast<size_type>(data_.size()))
-            THROW(std::out_of_range, "cannot index the #th element in a #-lengthed vector -- index out of bounds", n,
-                  data_.size());
-
-        return n;
-    }
-
-    auto index(size_type row, size_type column) const {
-        if (row < 0 || row >= rows_ || column < 0 || column >= columns_)
-            THROW(std::out_of_range,
-                  "cannot index the #th row and #th column in a #x# matrix -- indices are out of bounds", row, column,
-                  rows_, columns_);
-
-        return row * columns_ + column;
-    }
-
-    size_type rows_;
-    size_type columns_;
-    std::vector<value_type> data_;
-};
-
-template<typename T>
-auto operator*(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    if (lhs.columns() != rhs.rows())
-        THROW(std::invalid_argument,
-              "cannot multiply left hand side #x# matrix with right hand side #x# matrix -- left hand side columns "
-              "must match right hand side rows",
-              lhs.rows(), lhs.columns(), rhs.rows(), rhs.columns());
-
-    Matrix<T> result(lhs.rows(), rhs.columns());
-    for (auto i = 0; i < lhs.rows(); ++i)
-        for (auto k = 0; k < rhs.columns(); ++k)
-            for (auto j = 0; j < lhs.columns(); ++j)
-                result(i, k) += lhs(i, j) * rhs(j, k);
+template<typename U, typename T, size_type M, size_type N>
+auto matrix_cast(const Matrix<T, M, N>& matrix) {
+    Matrix<U, M, N> result;
+    std::transform(std::begin(matrix), std::end(matrix), std::begin(result),
+                   [](auto element) { return static_cast<U>(element); });
     return result;
 }
 
-template<typename T>
-auto operator-(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    auto result = lhs;
-    return result -= rhs;
+template<typename T, size_type M>
+auto dehomogenize(Matrix<T, M, 4>& matrix) {
+    for (auto i = 0; i < matrix.rows(); ++i)
+        for (auto j = 0; j < matrix.columns(); ++j)
+            matrix(i, j) /= matrix(i, matrix.columns() - 1);
 }
 
 template<typename T>
-auto operator+(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    auto result = lhs;
-    return result += rhs;
-}
+using RowVector2 = Matrix<T, 1, 2>;
 
 template<typename T>
-auto& operator<<(std::ostream& os, const Matrix<T>& matrix) {
-    for (auto i = 0; i < matrix.rows(); ++i) {
-        auto j = 0;
-        while (j + 1 < matrix.columns())
-            os << matrix(i, j++) << ", ";
-        os << matrix(i, j) << std::endl;
-    }
-    return os;
-}
+using RowVector3 = Matrix<T, 1, 3>;
 
 template<typename T>
-auto swap(Matrix<T>& lhs, Matrix<T>& rhs) {
-    lhs.swap(rhs);
-}
+using RowVector4 = Matrix<T, 1, 4>;
 
 template<typename T>
-auto operator*(const Matrix<T>& matrix, T scalar) {
-    Matrix<T> result = matrix;
-    return result *= scalar;
-}
+using ColumnVector3 = Matrix<T, 3, 1>;
 
 template<typename T>
-auto operator*(T scalar, const Matrix<T>& matrix) {
-    Matrix<T> result = matrix;
-    return result *= scalar;
-}
+using ColumnVector4 = Matrix<T, 4, 1>;
 
 template<typename T>
-auto operator-(const Matrix<T>& matrix) {
-    return matrix * -multiplicative_identity<T>;
-}
-
-template<typename T>
-auto magnitude(const Matrix<T>& matrix) {
-    if (matrix.rows() != 1 && matrix.columns() != 1)
-        THROW(std::invalid_argument, "cannot take the magnitude of a #x# matrix -- matrix must be row or column vector",
-              matrix.rows(), matrix.columns());
-
-    auto result = additive_identity<T>;
-    for (auto element : matrix)
-        result += element * element;
-    return std::sqrt(result);
-}
-
-template<typename T>
-auto normalized(const Matrix<T>& matrix) {
-    return (multiplicative_identity<T> / magnitude(matrix)) * matrix;
-}
-
-template<typename T>
-auto crossProduct(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-    if (lhs.rows() * lhs.columns() != 3 || rhs.rows() * rhs.columns() != 3)
-        THROW(std::invalid_argument,
-              "cannot take the cross product of two #x# and #x# matrices -- matrices must be row or column vectors of "
-              "length 3",
-              lhs.rows(), lhs.columns(), rhs.rows(), rhs.columns());
-
-    // clang-format off
-    return Matrix<T>{lhs(1) * rhs(2) - rhs(1) * lhs(2),
-                     rhs(0) * lhs(2) - lhs(0) * rhs(2),
-                     lhs(0) * rhs(1) - lhs(1) * rhs(0)};
-    // clang-format on
-}
+using Matrix4 = Matrix<T, 4, 4>;
 }
 }
 }

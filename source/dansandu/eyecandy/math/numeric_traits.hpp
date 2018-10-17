@@ -48,6 +48,17 @@ template<typename T>
 constexpr auto closeTo(T lhs, T rhs, T epsilon) {
     return std::abs(lhs - rhs) <= epsilon;
 }
+
+template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+constexpr auto interval(T value, T intervalBegin, T intervalExclusiveEnd) {
+    return intervalBegin <= value && value < intervalExclusiveEnd;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+constexpr auto subinterval(T subintervalBegin, T subintervalExclusiveEnd, T intervalBegin, T intervalExclusiveEnd) {
+    return intervalBegin <= subintervalBegin && subintervalBegin < intervalExclusiveEnd &&
+           intervalBegin < subintervalExclusiveEnd && subintervalExclusiveEnd <= intervalExclusiveEnd;
+}
 }
 }
 }

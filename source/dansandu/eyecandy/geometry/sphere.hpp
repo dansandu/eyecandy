@@ -1,13 +1,10 @@
 #pragma once
 
-#include "dansandu/eyecandy/geometry/mesh.hpp"
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
-#include "dansandu/eyecandy/math/transformation.hpp"
+#include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <cmath>
-#include <iostream>
-#include <stdexcept>
 #include <vector>
 
 namespace dansandu {
@@ -15,24 +12,25 @@ namespace eyecandy {
 namespace geometry {
 
 template<typename T>
-Mesh<T> sphere(T radius, int yResolution, int zResolution) {
+auto sphere(T radius, int yResolution, int zResolution) {
     if (yResolution < 3)
-        throw std::invalid_argument("y resolution must be three or more");
+        THROW(std::invalid_argument, "y resolution must be greater or equal to three -- # provided", yResolution);
 
     if (zResolution < 1)
-        throw std::invalid_argument("z resolution must be one or more");
+        THROW(std::invalid_argument, "z resolution must be greater or equal to one -- # provided", zResolution);
 
     using dansandu::eyecandy::math::additive_identity;
+    using dansandu::eyecandy::math::dynamic;
     using dansandu::eyecandy::math::Matrix;
     using dansandu::eyecandy::math::multiplicative_identity;
     using dansandu::eyecandy::math::pi;
+    using dansandu::eyecandy::math::size_type;
 
     auto vertexCount = yResolution * zResolution + 2;
     auto triangleCount = 2 * yResolution * zResolution;
-    Matrix<T> vertices(vertexCount, 4);
-    Matrix<int> triangles(triangleCount, 3);
-    auto triangleIndex = 0;
-    for (auto j = 0; j < yResolution; ++j) {
+    Matrix<T, dynamic, 4> vertices{vertexCount, 4};
+    Matrix<size_type, dynamic, 3> triangles{triangleCount, 3};
+    for (auto j = 0, triangleIndex = 0; j < yResolution; ++j) {
         triangles(triangleIndex, 0) = 0;
         triangles(triangleIndex, 1) = j + 1;
         triangles(triangleIndex, 2) = (j + 1) % yResolution + 1;
@@ -75,7 +73,7 @@ Mesh<T> sphere(T radius, int yResolution, int zResolution) {
     vertices(vertexCount - 1, 2) = additive_identity<T>;
     vertices(vertexCount - 1, 3) = multiplicative_identity<T>;
 
-    return Mesh<T>{vertices, triangles};
+    return std::pair<Matrix<T, dynamic, 4>, Matrix<size_type, dynamic, 3>>{std::move(vertices), std::move(triangles)};
 }
 }
 }
