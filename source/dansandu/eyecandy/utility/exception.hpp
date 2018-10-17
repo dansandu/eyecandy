@@ -9,16 +9,15 @@ namespace dansandu {
 namespace eyecandy {
 namespace utility {
 
-template<int line, typename E, typename... AA>
-auto prettyThrow(const char* exception, const char* function, const char* file, const std::string& message,
-                 AA&&... arguments) {
-    throw E{format("'", exception, "' exception in thread '", std::this_thread::get_id(),
-                   "': ", format(message, std::forward<AA>(arguments)...), std::endl, "    at ", function, "(", file,
-                   ":", line, ")")};
+template<typename E, typename... AA>
+auto prettyThrow(const char* exception, const char* function, const char* file, int line, AA&&... arguments) {
+    auto message = format(std::forward<AA>(arguments)...);
+    throw E{format("'", exception, "' exception in thread '", std::this_thread::get_id(), "': ", message, "\n    at ",
+                   function, "(", file, ":", line, ")")};
 }
 }
 }
 }
 
 #define THROW(exception, args...)                                                                                      \
-    dansandu::eyecandy::utility::prettyThrow<__LINE__, exception>(#exception, __func__, __FILE__, args)
+    dansandu::eyecandy::utility::prettyThrow<exception>(#exception, __func__, __FILE__, __LINE__, args)
