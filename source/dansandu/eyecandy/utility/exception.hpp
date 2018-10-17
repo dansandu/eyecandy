@@ -12,8 +12,9 @@ namespace utility {
 template<int line, typename E, typename... AA>
 auto prettyThrow(const char* exception, const char* function, const char* file, const std::string& message,
                  AA&&... arguments) {
-    throw E{format("'#' exception in thread '#': #\n  at #(#:#)", exception, std::this_thread::get_id(),
-                   format(message, std::forward<AA>(arguments)...), function, file, line)};
+    throw E{format("'", exception, "' exception in thread '", std::this_thread::get_id(),
+                   "': ", format(message, std::forward<AA>(arguments)...), std::endl, "    at ", function, "(", file,
+                   ":", line, ")")};
 }
 }
 }
