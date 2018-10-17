@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -11,7 +10,7 @@ namespace eyecandy {
 namespace utility {
 
 template<typename I>
-std::string join(const I& iterable, const std::string& separator) {
+auto join(const I& iterable, const std::string& separator) {
     std::stringstream ss;
     for (const auto& element : iterable)
         ss << element << separator;
@@ -24,12 +23,12 @@ inline auto formatWork(std::ostream& buffer) {}
 
 template<typename A, typename... AA>
 auto formatWork(std::ostream& buffer, A&& argument, AA&&... arguments) {
-    buffer << argument;
+    buffer << std::forward<A>(argument);
     formatWork(buffer, std::forward<AA>(arguments)...);
 }
 
 template<typename... AA>
-std::string format(AA&&... arguments) {
+auto format(AA&&... arguments) {
     std::stringstream buffer;
     formatWork(buffer, std::forward<AA>(arguments)...);
     return buffer.str();
