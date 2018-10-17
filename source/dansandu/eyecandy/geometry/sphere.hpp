@@ -2,9 +2,9 @@
 
 #include "dansandu/eyecandy/math/matrix.hpp"
 #include "dansandu/eyecandy/math/numeric_traits.hpp"
+#include "dansandu/eyecandy/utility/exception.hpp"
 
 #include <cmath>
-#include <stdexcept>
 #include <vector>
 
 namespace dansandu {
@@ -14,10 +14,10 @@ namespace geometry {
 template<typename T>
 auto sphere(T radius, int yResolution, int zResolution) {
     if (yResolution < 3)
-        throw std::invalid_argument{"y resolution must be three or more"};
+        THROW(std::invalid_argument, "y resolution must be greater or equal to three -- # provided", yResolution);
 
     if (zResolution < 1)
-        throw std::invalid_argument{"z resolution must be one or more"};
+        THROW(std::invalid_argument, "z resolution must be greater or equal to one -- # provided", zResolution);
 
     using dansandu::eyecandy::math::additive_identity;
     using dansandu::eyecandy::math::dynamic;
