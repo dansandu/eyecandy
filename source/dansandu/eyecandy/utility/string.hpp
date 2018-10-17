@@ -20,7 +20,7 @@ std::string join(const I& iterable, const std::string& separator) {
     return result;
 }
 
-inline auto formatWork(std::ostream& buffer) { }
+inline auto formatWork(std::ostream& buffer) {}
 
 template<typename A, typename... AA>
 auto formatWork(std::ostream& buffer, A&& argument, AA&&... arguments) {
