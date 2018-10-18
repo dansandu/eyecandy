@@ -27,10 +27,8 @@ public:
     Image(size_type width, size_type height, Color fill = Color{})
         : width_{width}, height_{height}, pixels_(width * height, fill) {
         if (width_ < 0 || height_ < 0)
-            THROW(std::invalid_argument,
-                  "invalid dimensions #x# provided in image constructor -- width and height must be greater than or "
-                  "equal to zero",
-                  width, height);
+            THROW(std::invalid_argument, "invalid dimensions ", width_, "x", height_,
+                  " provided in image constructor -- width and height must be greater than or equal to zero");
 
         if (width_ == 0 || height_ == 0)
             width_ = height_ = 0;
@@ -71,8 +69,8 @@ public:
 private:
     size_type index(size_type x, size_type y) const {
         if (x < 0 || x >= width_ || y < 0 || y >= height_)
-            THROW(std::out_of_range, "cannot index the (#, #) pixel in an #x# image -- indices are out of bounds", x, y,
-                  width_, height_);
+            THROW(std::out_of_range, "cannot index the (", x, ", ", y, ") pixel in an ", width_, "x", height_,
+                  " image -- indices are out of bounds");
 
         return x + (height_ - y - 1) * width_;
     }
