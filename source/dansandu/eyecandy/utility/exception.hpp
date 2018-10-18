@@ -19,5 +19,5 @@ auto prettyThrow(const char* exception, const char* function, const char* file, 
 }
 }
 
-#define THROW(exception, args...)                                                                                      \
-    dansandu::eyecandy::utility::prettyThrow<exception>(#exception, __func__, __FILE__, __LINE__, args)
+#define THROW(exception, ...)                                                                                      \
+    dansandu::eyecandy::utility::prettyThrow<exception>(#exception, __func__, __FILE__, __LINE__, __VA_ARGS__)
