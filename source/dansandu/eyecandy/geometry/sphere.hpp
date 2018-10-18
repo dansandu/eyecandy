@@ -14,10 +14,10 @@ namespace geometry {
 template<typename T>
 auto sphere(T radius, int yResolution, int zResolution) {
     if (yResolution < 3)
-        THROW(std::invalid_argument, "y resolution must be greater or equal to three -- # provided", yResolution);
+        THROW(std::invalid_argument, "y resolution must be greater or equal to three -- ", yResolution, " provided");
 
     if (zResolution < 1)
-        THROW(std::invalid_argument, "z resolution must be greater or equal to one -- # provided", zResolution);
+        THROW(std::invalid_argument, "z resolution must be greater or equal to one -- ", zResolution, " provided");
 
     using dansandu::eyecandy::math::additive_identity;
     using dansandu::eyecandy::math::dynamic;
