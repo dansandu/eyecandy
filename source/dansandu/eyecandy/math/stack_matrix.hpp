@@ -154,16 +154,15 @@ private:
     template<typename U = value_type, typename = std::enable_if_t<isStaticVector_, U>>
     auto index(size_type n) const {
         if (n < 0 || n >= rows_ * columns_)
-            THROW(std::out_of_range, "cannot index the #th element in a #-length vector", n, rows_ * columns_);
+            THROW(std::out_of_range, "cannot index the ", n, "th element in a ", rows_ * columns_, "-length vector");
 
         return n;
     }
 
     auto index(size_type row, size_type column) const {
         if (row < 0 || row >= rows_ || column < 0 || column >= columns_)
-            THROW(std::out_of_range,
-                  "cannot index the #th row and #th column in a #x# matrix -- indices are out of bounds", row, column,
-                  rows_, columns_);
+            THROW(std::out_of_range, "cannot index the ", row, ", ", column, " element in a ", rows_, "x", columns_,
+                  " matrix -- indices are out of bounds");
 
         return row * columns_ + column;
     }

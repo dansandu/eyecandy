@@ -30,15 +30,8 @@ TEST_CASE("string utility") {
     }
 
     SECTION("format") {
-        SECTION("too few arguments") { REQUIRE_THROWS_AS(format("# + # = #", 2, 3), std::invalid_argument); }
+        REQUIRE(format(2, " + ", 3, " = ", 5) == "2 + 3 = 5");
 
-        SECTION("too many arguments") {
-            REQUIRE_THROWS_AS(format("# + # = #", 2, 3, 5, 0), std::invalid_argument);
-            REQUIRE_THROWS_AS(format("no formatting", 1), std::invalid_argument);
-        }
-
-        SECTION("no arguments") { REQUIRE(format("no formatting") == "no formatting"); }
-
-        REQUIRE(format("The # jumped the # twice", "cat", "fence") == "The cat jumped the fence twice");
+        REQUIRE(format("The ", "cat", " jumped the ", "fence", " twice") == "The cat jumped the fence twice");
     }
 }

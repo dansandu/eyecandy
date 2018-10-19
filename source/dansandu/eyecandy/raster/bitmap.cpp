@@ -95,11 +95,13 @@ Image readBitmapFile(const std::string& path) {
     };
 
     if (!file)
-        THROW(BitmapReadException, "file '#' does not exist", path);
+        THROW(BitmapReadException, "file '", path, "' does not exist");
 
-    if (!readBytes(2) || buffer[0] != 0x42 || buffer[1] != 0x4D)
-        THROW(BitmapReadException, "invalid magic words in header -- 66 77 were expected instead of # #",
-              static_cast<int>(buffer[0]), static_cast<int>(buffer[1]));
+    auto firstHeaderByte = 0x42;
+    auto secondHeaderByte = 0x4D;
+    if (!readBytes(2) || buffer[0] != firstHeaderByte || buffer[1] != secondHeaderByte)
+        THROW(BitmapReadException, "invalid magic words in header -- ", firstHeaderByte, " ", secondHeaderByte,
+              " were expected instead of ", static_cast<int>(buffer[0]), " ", static_cast<int>(buffer[1]));
 
     if (!readBytes(16)) // skip to width at offset 18
         THROW(BitmapReadException, "bytes 2-17 are missing from the header");
