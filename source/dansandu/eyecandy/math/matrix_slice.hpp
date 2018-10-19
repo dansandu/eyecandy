@@ -23,10 +23,13 @@ struct slicer {
                  T>>
     static auto slice(const Matrix<T, staticRows, staticColumns>& matrix) {
         if (!subinterval(staticRowBegin, staticRowBegin + staticRowCount, 0, matrix.rows()))
-            THROW(std::invalid_argument, "cannot slice rows [", staticRowBegin, ", ", staticRowBegin + staticRowCount, ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
+            THROW(std::invalid_argument, "cannot slice rows [", staticRowBegin, ", ", staticRowBegin + staticRowCount,
+                  ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
 
         if (!subinterval(staticColumnBegin, staticColumnBegin + staticColumnCount, 0, matrix.columns()))
-            THROW(std::invalid_argument, "cannot slice columns [", staticColumnBegin, ", ", staticColumnBegin + staticColumnCount, ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
+            THROW(std::invalid_argument, "cannot slice columns [", staticColumnBegin, ", ",
+                  staticColumnBegin + staticColumnCount, ") of a ", matrix.rows(), "x", matrix.columns(),
+                  " matrix -- slice exceeds matrix boundries");
 
         Matrix<T, staticRowCount, staticColumnCount> result{staticRowCount, staticColumnCount};
         for (auto i = 0; i < staticRowCount; ++i)
@@ -48,10 +51,13 @@ struct slicer<dynamic, staticRowCount, staticColumnBegin, staticColumnCount> {
                  T>>
     static auto slice(const Matrix<T, staticRows, staticColumns>& matrix, size_type dynamicRowBegin) {
         if (!subinterval(dynamicRowBegin, dynamicRowBegin + staticRowCount, 0, matrix.rows()))
-            THROW(std::invalid_argument, "cannot slice rows [", dynamicRowBegin, ", ", dynamicRowBegin + staticRowCount, ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
+            THROW(std::invalid_argument, "cannot slice rows [", dynamicRowBegin, ", ", dynamicRowBegin + staticRowCount,
+                  ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
 
         if (!subinterval(staticColumnBegin, staticColumnBegin + staticColumnCount, 0, matrix.columns()))
-            THROW(std::invalid_argument, "cannot slice columns [", staticColumnBegin, ", ", staticColumnBegin + staticColumnCount, ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
+            THROW(std::invalid_argument, "cannot slice columns [", staticColumnBegin, ", ",
+                  staticColumnBegin + staticColumnCount, ") of a ", matrix.rows(), "x", matrix.columns(),
+                  " matrix -- slice exceeds matrix boundries");
 
         Matrix<T, staticRowCount, staticColumnCount> result{staticRowCount, staticColumnCount};
         for (auto i = 0; i < staticRowCount; ++i)
@@ -73,10 +79,13 @@ struct slicer<staticRowBegin, dynamic, staticColumnBegin, staticColumnCount> {
                  T>>
     static auto slice(const Matrix<T, staticRows, staticColumns>& matrix, size_type dynamicRowCount) {
         if (!subinterval(staticRowBegin, staticRowBegin + dynamicRowCount, 0, matrix.rows()))
-            THROW(std::invalid_argument, "cannot slice rows [", staticRowBegin, ", ", staticRowBegin + dynamicRowCount, ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
+            THROW(std::invalid_argument, "cannot slice rows [", staticRowBegin, ", ", staticRowBegin + dynamicRowCount,
+                  ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
 
         if (!subinterval(staticColumnBegin, staticColumnBegin + staticColumnCount, 0, matrix.columns()))
-            THROW(std::invalid_argument, "cannot slice columns [", staticColumnBegin, ", ", staticColumnBegin + staticColumnCount, ") of a ", matrix.rows(), "x", matrix.columns(), " matrix -- slice exceeds matrix boundries");
+            THROW(std::invalid_argument, "cannot slice columns [", staticColumnBegin, ", ",
+                  staticColumnBegin + staticColumnCount, ") of a ", matrix.rows(), "x", matrix.columns(),
+                  " matrix -- slice exceeds matrix boundries");
 
         Matrix<T, dynamic, staticColumnCount> result{dynamicRowCount, staticColumnCount};
         for (auto i = 0; i < dynamicRowCount; ++i)

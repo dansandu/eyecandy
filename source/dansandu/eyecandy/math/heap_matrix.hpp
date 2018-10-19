@@ -50,11 +50,11 @@ public:
     Matrix(size_type rowCount, size_type columnCount, std::vector<value_type> buffer)
         : rows_{rowCount}, columns_{columnCount}, data_{std::move(buffer)} {
         if (rows_ < 0 || columns_ < 0)
-            THROW(std::invalid_argument,
-                  "invalid dimensions ", rows_, "x", columns_, " provided in matrix constructor -- rows and columns must be greater than or equal to zero");
+            THROW(std::invalid_argument, "invalid dimensions ", rows_, "x", columns_,
+                  " provided in matrix constructor -- rows and columns must be greater than or equal to zero");
 
         if ((staticRows != rows_ && staticRows != dynamic) || (staticColumns != columns_ && staticColumns != dynamic))
-            THROW(std::invalid_argument, "static dimensions ", staticRows == dynamic ? "M" : staticRows, "x", staticColumns == dynamic ? "N" : staticColumns,
+            THROW(std::invalid_argument, "static dimensions ", staticRows, "x", staticColumns,
                   " do not match dynamic dimensions ", rows_, "x", columns_);
 
         if (rows_ * columns_ != static_cast<size_type>(data_.size()))
@@ -65,11 +65,11 @@ public:
            value_type fillValue = dansandu::eyecandy::math::additive_identity<value_type>)
         : rows_{rowCount}, columns_{columnCount} {
         if (rows_ < 0 || columns_ < 0)
-            THROW(std::invalid_argument,
-                  "invalid dimensions ", rows_, "x", columns_, " provided in matrix constructor -- rows and columns must be greater than or equal to zero");
+            THROW(std::invalid_argument, "invalid dimensions ", rows_, "x", columns_,
+                  " provided in matrix constructor -- rows and columns must be greater than or equal to zero");
 
         if ((staticRows != rows_ && staticRows != dynamic) || (staticColumns != columns_ && staticColumns != dynamic))
-            THROW(std::invalid_argument, "static dimensions ", staticRows == dynamic ? "M" : staticRows, "x", staticColumns == dynamic ? "N" : staticColumns,
+            THROW(std::invalid_argument, "static dimensions ", staticRows, "x", staticColumns,
                   " do not match dynamic dimensions ", rows_, "x", columns_);
 
         data_ = std::vector<value_type>(rows_ * columns_, fillValue);
@@ -85,7 +85,8 @@ public:
 
     Matrix& operator+=(const Matrix& other) {
         if (rows_ != other.rows_ || columns_ != other.columns_)
-            THROW(std::invalid_argument, "cannot add right hand side ", other.rows_, "x", other.columns_, " matrix to left hand side ", rows_, "x", columns_, " matrix -- matrix dimensions must match");
+            THROW(std::invalid_argument, "cannot add right hand side ", other.rows_, "x", other.columns_,
+                  " matrix to left hand side ", rows_, "x", columns_, " matrix -- matrix dimensions must match");
 
         std::transform(begin(), end(), other.begin(), begin(), std::plus<T>{});
         return *this;
@@ -93,7 +94,8 @@ public:
 
     Matrix& operator-=(const Matrix& other) {
         if (rows_ != other.rows_ || columns_ != other.columns_)
-            THROW(std::invalid_argument, "cannot subtract right hand side ", other.rows_, "x", other.columns_, " matrix from left hand side ", rows_, "x", columns_, " matrix -- matrix dimensions must match");
+            THROW(std::invalid_argument, "cannot subtract right hand side ", other.rows_, "x", other.columns_,
+                  " matrix from left hand side ", rows_, "x", columns_, " matrix -- matrix dimensions must match");
 
         std::transform(begin(), end(), other.begin(), begin(), std::minus<T>{});
         return *this;
@@ -177,7 +179,8 @@ public:
 private:
     auto index(size_type row, size_type column) const {
         if (row < 0 || row >= rows_ || column < 0 || column >= columns_)
-            THROW(std::out_of_range, "cannot index the ", row, ", ", column, " element in a ", rows_, "x", columns_, " matrix -- indices are out of bounds");
+            THROW(std::out_of_range, "cannot index the ", row, ", ", column, " element in a ", rows_, "x", columns_,
+                  " matrix -- indices are out of bounds");
 
         return row * columns_ + column;
     }
