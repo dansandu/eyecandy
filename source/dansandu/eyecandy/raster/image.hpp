@@ -45,7 +45,7 @@ public:
     Image& operator=(Image&& other) noexcept {
         width_ = other.width_;
         height_ = other.height_;
-        pixels_ = std::move(pixels_);
+        pixels_ = std::move(other.pixels_);
         other.width_ = other.height_ = 0;
         return *this;
     }
