@@ -11,3 +11,4 @@ dependencies:
 - organization: catchorg
   artifact: catch
   version: 2.+5.+0
+  scope: test
