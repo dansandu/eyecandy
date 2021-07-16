@@ -1,8 +1,6 @@
 #include "catchorg/catch/catch.hpp"
 #include "dansandu/eyecandy/transform.hpp"
 
-#include <iostream>
-
 using dansandu::eyecandy::Matrix4;
 using dansandu::eyecandy::Vector3;
 using dansandu::eyecandy::transform::lookAt;
